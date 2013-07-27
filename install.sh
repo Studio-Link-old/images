@@ -10,7 +10,7 @@ $pacman -Syu
 $pacman -S git vim
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
-$pacman -S python2-virtualenv python2-dev alsa-plugins alsa-utils supervisor gcc make redis
+$pacman -S python2-virtualenv python2-dev alsa-plugins alsa-utils supervisor gcc make redis sudo
 
 # Enable systemd start scripts
 systemctl enable nginx
@@ -22,6 +22,7 @@ systemctl enable redis
 useradd --create-home --home-dir $home studio
 virtualenv2 --system-site-packages $home
 git clone $repo $home/webapp
+$home/bin/pip install pytz==2013b
 $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
 chown -R studio:studio $home
 gpasswd -a studio audio
@@ -42,7 +43,7 @@ cat > /etc/nginx/nginx.conf << EOF
 worker_processes  1;
 
 events {
-        worker_connections  1024;
+        worker_connections  20;
 }
 
 http {
@@ -76,6 +77,23 @@ http {
 }
 EOF
 
+cat > /etc/avahi/services/http.service << EOF
+<?xml version="1.0" standalone='no'?><!--*-nxml-*-->
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+<name replace-wildcards="yes">%h HTTP</name>
+<service>
+<type>_http._tcp</type>
+<port>80</port>
+</service>
+</service-group>
+EOF
+
+# Sudo
+echo "studio ALL=(ALL) ALL" >> /etc/sudoers
+
+# Hostname
+echo "podlove" > /etc/hostname
 
 # Cleanup
 $pacman -Scc
