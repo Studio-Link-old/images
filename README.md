@@ -6,6 +6,9 @@
 
 http://archlinuxarm.org/os/rpi/archlinux-hf-2013-06-15.img.zip
 
+### Cubieboard2
+
+Coming Soon!
 
 ## Bootstrap
 
