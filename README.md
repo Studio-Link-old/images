@@ -6,9 +6,9 @@
 
 http://archlinuxarm.org/os/rpi/archlinux-hf-2013-06-15.img.zip
 
-### Cubieboard2
+### Cubieboard 2 (Allwinner A20)
 
-Coming Soon!
+http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
 
 ## Bootstrap
 
