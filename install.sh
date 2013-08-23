@@ -95,6 +95,9 @@ echo "studio ALL=(ALL) ALL" >> /etc/sudoers
 # Hostname
 echo "podlove" > /etc/hostname
 
+# Disable root account
+passwd -l root
+
 # Cleanup
 $pacman -Scc
 reboot
