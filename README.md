@@ -1,4 +1,4 @@
-# Podlove Studio Connect
+# Studio Connect
 
 ## Current Base Images
 
@@ -12,7 +12,7 @@ http://archlinuxarm.org/platforms/armv7/ti/beaglebone-black
 
 ## Bootstrap
 
-If you're looking for the *one-liner* to install podlove studio connect...
+If you're looking for the *one-liner* to install...
 
 
 Using ``wget`` to install:
