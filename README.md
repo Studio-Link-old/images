@@ -19,9 +19,9 @@ Using ``wget`` to install:
 
 ```pacman -Sy wget```
 
-```wget -O - https://raw.github.com/podlove-studio-connect/images/master/install.sh | bash```
+```wget -O - https://raw.github.com/studio-connect/images/master/install.sh | bash```
 
 
 If you have certificate issues using ``wget`` try the following:
 
-```wget --no-check-certificate -O - https://raw.github.com/podlove-studio-connect/images/master/install.sh | bash```
+```wget --no-check-certificate -O - https://raw.github.com/studio-connect/images/master/install.sh | bash```
