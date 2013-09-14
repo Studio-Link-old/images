@@ -14,14 +14,4 @@ http://archlinuxarm.org/platforms/armv7/ti/beaglebone-black
 
 If you're looking for the *one-liner* to install...
 
-
-Using ``wget`` to install:
-
-```pacman -Sy wget```
-
-```wget -O - https://raw.github.com/studio-connect/images/master/install.sh | bash```
-
-
-If you have certificate issues using ``wget`` try the following:
-
-```wget --no-check-certificate -O - https://raw.github.com/studio-connect/images/master/install.sh | bash```
+```curl https://raw.github.com/studio-connect/images/master/install.sh | bash```

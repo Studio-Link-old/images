@@ -24,6 +24,8 @@ virtualenv2 --system-site-packages $home
 git clone $repo $home/webapp
 $home/bin/pip install pytz==2013b
 $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+cd $home/webapp
+$home/bin/python -c "from app import db; db.create_all();"
 chown -R studio:studio $home
 gpasswd -a studio audio
 gpasswd -a studio video
