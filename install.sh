@@ -7,7 +7,7 @@ repo="https://github.com/studio-connect/webapp.git"
 
 # Install packages
 $pacman -Syu
-$pacman -S git vim
+$pacman -S git vim ntp
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
 $pacman -S python2-virtualenv alsa-plugins alsa-utils supervisor gcc make redis sudo
@@ -17,6 +17,7 @@ systemctl enable nginx
 systemctl enable avahi-daemon
 systemctl enable supervisord
 systemctl enable redis
+systemctl enable ntpd
 
 # Create User and generate Virtualenv
 useradd --create-home --password paCam17s4xpyc --home-dir $home studio
@@ -99,6 +100,9 @@ echo "studio-connect" > /etc/hostname
 
 # Disable root account
 passwd -l root
+
+# Set timezone
+timedatectl set-timezone Europe/Berlin
 
 # Cleanup
 $pacman -Scc
