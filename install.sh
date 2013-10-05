@@ -10,20 +10,20 @@ $pacman -Syu
 $pacman -S git vim ntp
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
-$pacman -S python2-virtualenv alsa-plugins alsa-utils supervisor gcc make redis sudo
+$pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
 # Enable systemd start scripts
 systemctl enable nginx
 systemctl enable avahi-daemon
-systemctl enable supervisord
 systemctl enable redis
-systemctl enable ntpd
+systemctl enable ntpdate
+systemctl enable aiccu
 
 # Create User and generate Virtualenv
 useradd --create-home --password paCam17s4xpyc --home-dir $home studio
 virtualenv2 --system-site-packages $home
 git clone $repo $home/webapp
-$home/bin/pip install pytz==2013b
+$home/bin/pip install pytz==2013.7
 $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
 cd $home/webapp
 $home/bin/python -c "from app import db; db.create_all();"
@@ -33,14 +33,23 @@ gpasswd -a studio video
 mkdir $home/logs
 
 # Deploy configs
-cat > /etc/supervisor.d/studio-webapp.ini << EOF
-[program:studio-webapp]
-command=/opt/studio/bin/python /opt/studio/webapp/app.fcgi
-autorestart=true
-user=studio
-numprocs=1
-process_name=%(program_name)s_%(process_num)02d
+cat > /etc/systemd/system/studio-webapp.service << EOF
+[Unit]
+Description=studio-webapp fastcgi
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.fcgi
+
+[Install]
+WantedBy=multi-user.target
 EOF
+
+systemctl enable studio-webapp
 
 cat > /etc/nginx/nginx.conf << EOF
 worker_processes  1;
