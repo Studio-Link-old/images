@@ -12,12 +12,6 @@ $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
-# Enable systemd start scripts
-systemctl enable nginx
-systemctl enable avahi-daemon
-systemctl enable redis
-systemctl enable ntpdate
-systemctl enable aiccu
 
 # Create User and generate Virtualenv
 useradd --create-home --password paCam17s4xpyc --home-dir $home studio
@@ -49,7 +43,40 @@ ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.fcgi
 WantedBy=multi-user.target
 EOF
 
-systemctl enable studio-webapp
+cat > /etc/systemd/system/studio-celery.service << EOF
+[Unit]
+Description=studio-celery worker
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=2
+WorkingDirectory=/opt/studio/webapp
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/aiccu.service << EOF
+[Unit]
+Description=SixXS Automatic IPv6 Connectivity Configuration Utility
+After=network.target
+After=ntpdate.service
+
+[Service]
+Type=forking
+PIDFile=/var/run/aiccu.pid
+ExecStart=/usr/bin/aiccu start
+ExecStop=/usr/bin/aiccu stop
+Restart=always
+RestartSec=20
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 cat > /etc/nginx/nginx.conf << EOF
 worker_processes  1;
@@ -100,6 +127,15 @@ cat > /etc/avahi/services/http.service << EOF
 </service>
 </service-group>
 EOF
+
+# Enable systemd start scripts
+systemctl enable nginx
+systemctl enable avahi-daemon
+systemctl enable redis
+systemctl enable ntpdate
+systemctl enable studio-webapp
+systemctl enable studio-celery
+systemctl enable aiccu.service
 
 # Sudo
 echo "studio ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
