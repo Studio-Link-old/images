@@ -95,9 +95,9 @@ http {
         gzip  off;
 
         server {
-                listen       80;
+                listen  80;
+                listen  [::]:80;
                 server_name  localhost;
-
 
                 location / { try_files \$uri @yourapplication; }
                 location @yourapplication {
@@ -114,6 +114,27 @@ http {
 
         }
 }
+EOF
+
+cat > /usr/share/nginx/html/50x.html << EOF
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rebooting</title>
+    <style>
+        body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rebooting...</h1>
+
+    <p>Please wait and retry a few seconds later.</p>
+</body>
+</html>
 EOF
 
 cat > /etc/avahi/services/http.service << EOF
