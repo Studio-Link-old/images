@@ -4,6 +4,13 @@
 pacman="pacman --noconfirm --force"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
+version="13.11.0-dev"
+
+# Update Mirrorlist
+cat > /etc/pacman.d/mirrorlist << EOF
+# Studio Connect Mirror
+Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
+EOF
 
 # Install packages
 $pacman -Syu
@@ -13,18 +20,21 @@ $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plug
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
 # Create User and generate Virtualenv
-useradd --create-home --password paCam17s4xpyc --home-dir $home studio
-virtualenv2 --system-site-packages $home
-git clone $repo $home/webapp
-$home/bin/pip install pytz==2013.7
-$home/bin/pip install --upgrade -r $home/webapp/requirements.txt
-cd $home/webapp
-$home/bin/python -c "from app import db; db.create_all();"
+id studio
+if [ $? == 1 ]; then
+    useradd --create-home --password paCam17s4xpyc --home-dir $home studio
+    virtualenv2 --system-site-packages $home
+    git clone $repo $home/webapp
+    $home/bin/pip install pytz==2013.7
+    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+    cd $home/webapp
+    $home/bin/python -c "from app import db; db.create_all();"
+fi
 chown -R studio:studio $home
 chmod 755 $home
 gpasswd -a studio audio
 gpasswd -a studio video
-mkdir $home/logs
+mkdir -p $home/logs
 
 # Deploy configs
 cat > /etc/systemd/system/studio-webapp.service << EOF
@@ -54,9 +64,25 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=2 -B
+ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 -B
 WorkingDirectory=/opt/studio/webapp
-CPUShares=2048
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/studio-celery2.service << EOF
+[Unit]
+Description=studio-celery worker
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1
+WorkingDirectory=/opt/studio/webapp
 
 [Install]
 WantedBy=multi-user.target
@@ -173,6 +199,20 @@ cat > /etc/iptables/ip6tables.rules << EOF
 COMMIT
 EOF
 
+# Allow ipv4 autoconfiguration (comment noipv4ll)
+# https://wiki.archlinux.org/index.php/avahi#Obtaining_IPv4LL_IP_address
+cat > /etc/dhcpcd.conf << EOF
+hostname
+duid
+option rapid_commit
+option domain_name_servers, domain_name, domain_search, host_name
+option classless_static_routes
+option ntp_servers
+require dhcp_server_identifier
+nohook lookup-hostname
+#noipv4ll
+EOF
+
 # Enable systemd start scripts
 systemctl enable nginx
 systemctl enable avahi-daemon
@@ -180,10 +220,14 @@ systemctl enable redis
 systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
+systemctl enable studio-celery2
 systemctl enable ip6tables.service
 
 # Sudo
-echo "studio ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+cat > /etc/sudoers << EOF
+root ALL=(ALL) ALL
+studio ALL=(ALL) NOPASSWD: ALL
+EOF
 
 # Hostname
 post=`ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4`
@@ -197,4 +241,6 @@ timedatectl set-timezone Europe/Berlin
 
 # Cleanup
 $pacman -Scc
-reboot
+
+# Update Version
+echo $version > /etc/studio-release
