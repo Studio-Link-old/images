@@ -38,6 +38,7 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.fcgi
+CPUShares=100
 
 [Install]
 WantedBy=multi-user.target
@@ -55,6 +56,7 @@ User=studio
 Group=studio
 ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=2 -B
 WorkingDirectory=/opt/studio/webapp
+CPUShares=2048
 
 [Install]
 WantedBy=multi-user.target
@@ -184,7 +186,8 @@ systemctl enable ip6tables.service
 echo "studio ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # Hostname
-echo "studio-connect" > /etc/hostname
+post=`ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4`
+echo "studio-connect-$post" > /etc/hostname
 
 # Disable root account
 passwd -l root
