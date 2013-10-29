@@ -69,7 +69,7 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 -B
+ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1
 WorkingDirectory=/opt/studio/webapp
 
 [Install]
