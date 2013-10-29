@@ -249,3 +249,11 @@ $pacman -Scc
 
 # Update Version
 echo $version > /etc/studio-release
+
+# Bugfixing
+cd /tmp
+wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
+wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
+wget http://mirror.studio-connect.de/python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+$pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
+$pacman -U pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
