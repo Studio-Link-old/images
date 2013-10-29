@@ -234,6 +234,11 @@ root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
+# Mount Options (noatime)
+cat > /etc/fstab << EOF
+/dev/mmcblk0p2 / ext4 defaults,noatime,nodiratime 0 1
+EOF
+
 # Hostname
 post=`ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4`
 echo "studio-connect-$post" > /etc/hostname
