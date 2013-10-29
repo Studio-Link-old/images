@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # VARS
-pacman="pacman --noconfirm --force"
+pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 version="13.11.0-dev"
@@ -30,6 +30,8 @@ if [ $? == 1 ]; then
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
 else
+    cd $home/webapp
+    git pull
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
 fi
