@@ -29,6 +29,9 @@ if [ $? == 1 ]; then
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
+else
+    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+    redis-cli FLUSHALL
 fi
 chown -R studio:studio $home
 chmod 755 $home
