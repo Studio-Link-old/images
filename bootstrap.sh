@@ -14,7 +14,7 @@ EOF
 
 # Install packages
 $pacman -Syu
-$pacman -S git vim ntp
+$pacman -S git vim ntp linux-am33x-legacy
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
