@@ -36,6 +36,9 @@ else
     git pull
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
+    systemctl stop studio-webapp
+    systemctl stop studio-celery
+    systemctl stop studio-celery2
 fi
 chown -R studio:studio $home
 chmod 755 $home
@@ -245,6 +248,12 @@ cat > /etc/fstab << EOF
 /dev/mmcblk0p2 / ext4 defaults,noatime,nodiratime 0 1
 EOF
 
+# Limit systemd journal
+cat > /etc/systemd/journald.conf << EOF
+[Journal]
+SystemMaxUse=10M
+EOF
+
 # Hostname
 post=`ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4`
 echo "studio-connect-$post" > /etc/hostname
@@ -261,6 +270,9 @@ $pacman -Scc
 # Update Version
 echo $version > /etc/studio-release
 
+# Logrotate (mostly nginx logs)
+logrotate -f /etc/logrotate.conf
+
 # Bugfixing
 cd /tmp
 wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
@@ -268,3 +280,8 @@ wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
 wget http://mirror.studio-connect.de/python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
 $pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
 $pacman -U pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+
+# Starting Services
+systemctl start studio-webapp
+systemctl start studio-celery
+systemctl start studio-celery2
