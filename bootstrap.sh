@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="13.11.0-dev"
+version="13.11.1-dev"
 
 # Update Mirrorlist
 cat > /etc/pacman.d/mirrorlist << EOF
@@ -14,7 +14,9 @@ EOF
 
 # Install packages
 $pacman -Syu
-$pacman -S git vim ntp linux-am33x-legacy
+$pacman -R linux-am33x-legacy
+$pacman -S linux-am33x
+$pacman -S git vim ntp 
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
@@ -206,9 +208,10 @@ EOF
 
 # Allow ipv4 autoconfiguration (comment noipv4ll)
 # https://wiki.archlinux.org/index.php/avahi#Obtaining_IPv4LL_IP_address
+# use clientid with avm fritzbox
 cat > /etc/dhcpcd.conf << EOF
 hostname
-duid
+clientid
 option rapid_commit
 option domain_name_servers, domain_name, domain_search, host_name
 option classless_static_routes
@@ -226,7 +229,10 @@ systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
 systemctl enable studio-celery2
-systemctl enable ip6tables.service
+
+# Temporary disabling ip6tables until final version
+#systemctl enable ip6tables.service
+systemctl disable ip6tables.service
 
 # Sudo
 cat > /etc/sudoers << EOF
