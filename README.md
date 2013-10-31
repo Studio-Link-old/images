@@ -2,10 +2,6 @@
 
 ## Current Base Images
 
-### Cubieboard 2 (Allwinner A20)
-
-http://archlinuxarm.org/os/ArchLinuxARM-sun7i-latest.tar.gz
-
 ### BeagleBone Black
 
 http://archlinuxarm.org/platforms/armv7/ti/beaglebone-black
