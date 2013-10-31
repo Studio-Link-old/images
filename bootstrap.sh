@@ -14,7 +14,7 @@ EOF
 
 # Install packages
 $pacman -Syu
-$pacman -R linux-am33x-legacy
+pacman --noconfirm -R linux-am33x-legacy
 $pacman -S linux-am33x
 $pacman -S git vim ntp 
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
