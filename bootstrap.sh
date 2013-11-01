@@ -5,6 +5,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 version="13.11.1-dev"
+branch="master"
 
 # Update Mirrorlist
 cat > /etc/pacman.d/mirrorlist << EOF
@@ -34,6 +35,7 @@ if [ $? == 1 ]; then
 else
     cd $home/webapp
     git pull
+    git checkout $branch
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
     systemctl stop studio-webapp
