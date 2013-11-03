@@ -78,6 +78,7 @@ User=studio
 Group=studio
 ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 -B
 WorkingDirectory=/opt/studio/webapp
+CPUShares=2048
 
 [Install]
 WantedBy=multi-user.target
@@ -95,6 +96,7 @@ User=studio
 Group=studio
 ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1
 WorkingDirectory=/opt/studio/webapp
+CPUShares=2048
 
 [Install]
 WantedBy=multi-user.target
