@@ -42,6 +42,11 @@ else
     systemctl stop studio-celery
     systemctl stop studio-celery2
 fi
+
+if [ ! -f $home/webapp/htpasswd ]; then
+    echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
+fi
+
 chown -R studio:studio $home
 chmod 755 $home
 gpasswd -a studio audio
