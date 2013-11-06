@@ -35,7 +35,7 @@ if [ $? == 1 ]; then
 else
     cd $home/webapp
     git pull
-    git -f checkout $checkout
+    git checkout -f $checkout
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
     systemctl stop studio-webapp
