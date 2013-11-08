@@ -5,7 +5,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 version="13.11.1-dev"
-checkout="13.11.1-dev"
+checkout="master"
 
 # Update Mirrorlist
 cat > /etc/pacman.d/mirrorlist << EOF
