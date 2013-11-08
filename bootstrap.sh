@@ -36,6 +36,7 @@ else
     cd $home/webapp
     git pull
     git checkout -f $checkout
+    git pull
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
     systemctl stop studio-webapp
