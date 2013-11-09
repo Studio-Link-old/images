@@ -7,7 +7,13 @@ repo="https://github.com/studio-connect/webapp.git"
 version="13.11.2-dev"
 checkout="master"
 
-if [ `uname -m` == "armv7l" ]; then
+# Root permissions are required to run this script
+if [ "$(whoami)" != "root" ]; then
+    echoerror "Studio Connect Bootstrap requires root privileges to install. Please re-run this script as root."
+    exit 1
+fi
+
+if [ "$(uname -m)" == "armv7l" ]; then
 # Update Mirrorlist
 cat > /etc/pacman.d/mirrorlist << EOF
 # Studio Connect Mirror
@@ -255,7 +261,7 @@ root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
-if [ `uname -m` == "armv7l" ]; then
+if [ "$(uname -m)" == "armv7l" ]; then
 # Mount Options (noatime)
 cat > /etc/fstab << EOF
 /dev/mmcblk0p2 / ext4 defaults,noatime,nodiratime 0 1
@@ -269,7 +275,7 @@ SystemMaxUse=10M
 EOF
 
 # Hostname
-post=`ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4`
+post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4)
 echo "studio-connect-$post" > /etc/hostname
 
 # Disable root account
@@ -288,7 +294,7 @@ echo $version > /etc/studio-release
 logrotate -f /etc/logrotate.conf
 
 # Bugfixing
-if [ `uname -m` == "armv7l" ]; then
+if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
     wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
     wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
