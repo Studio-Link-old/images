@@ -4,19 +4,21 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="13.11.1-dev"
+version="13.11.2-dev"
 checkout="master"
 
+if [ `uname -m` == "armv7l" ]; then
 # Update Mirrorlist
 cat > /etc/pacman.d/mirrorlist << EOF
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
+pacman --noconfirm -R linux-am33x-legacy
+$pacman -S linux-am33x
+fi
 
 # Install packages
 $pacman -Syu
-pacman --noconfirm -R linux-am33x-legacy
-$pacman -S linux-am33x
 $pacman -S git vim ntp 
 $pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
 $pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
@@ -221,10 +223,10 @@ EOF
 
 # Allow ipv4 autoconfiguration (comment noipv4ll)
 # https://wiki.archlinux.org/index.php/avahi#Obtaining_IPv4LL_IP_address
-# use clientid with avm fritzbox
 cat > /etc/dhcpcd.conf << EOF
 hostname
 clientid
+#duid
 option rapid_commit
 option domain_name_servers, domain_name, domain_search, host_name
 option classless_static_routes
@@ -253,10 +255,12 @@ root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
+if [ `uname -m` == "armv7l" ]; then
 # Mount Options (noatime)
 cat > /etc/fstab << EOF
 /dev/mmcblk0p2 / ext4 defaults,noatime,nodiratime 0 1
 EOF
+fi
 
 # Limit systemd journal
 cat > /etc/systemd/journald.conf << EOF
@@ -284,12 +288,14 @@ echo $version > /etc/studio-release
 logrotate -f /etc/logrotate.conf
 
 # Bugfixing
-cd /tmp
-wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
-wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
-wget http://mirror.studio-connect.de/python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
-$pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
-$pacman -U pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+if [ `uname -m` == "armv7l" ]; then
+    cd /tmp
+    wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
+    wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
+    wget http://mirror.studio-connect.de/python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+    $pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
+    $pacman -U pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+fi
 
 # Starting Services
 systemctl start studio-webapp
