@@ -245,6 +245,12 @@ nohook lookup-hostname
 #noipv4ll
 EOF
 
+cat > /etc/netctl/hooks/dhcpcd-timeout << EOF
+TimeoutDHCP=40
+EOF
+
+chmod +x /etc/netctl/hooks/dhcpcd-timeout
+
 # Enable systemd start scripts
 systemctl enable nginx
 systemctl enable avahi-daemon
