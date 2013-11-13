@@ -90,7 +90,7 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 --purge -B 
+ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 --purge
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
 
@@ -100,7 +100,7 @@ EOF
 
 cat > /etc/systemd/system/studio-celery2.service << EOF
 [Unit]
-Description=studio-celery worker
+Description=studio-celery2 worker
 After=syslog.target
 After=network.target
 
@@ -111,6 +111,24 @@ Group=studio
 ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/studio-beat.service << EOF
+[Unit]
+Description=studio-beat
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/opt/studio/bin/celery beat --app=app -l info
+WorkingDirectory=/opt/studio/webapp
+CPUShares=100
 
 [Install]
 WantedBy=multi-user.target
@@ -259,6 +277,7 @@ systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
 systemctl enable studio-celery2
+systemctl enable studio-beat
 
 # Temporary disabling ip6tables until final version
 #systemctl enable ip6tables.service
