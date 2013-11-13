@@ -303,7 +303,7 @@ SystemMaxUse=10M
 EOF
 
 # Hostname
-post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | cut -c -4)
+post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | sed s/://g | cut -c 7-)
 echo "studio-connect-$post" > /etc/hostname
 
 # Disable root account
