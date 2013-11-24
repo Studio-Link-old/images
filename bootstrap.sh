@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="13.11.2-dev"
+version="13.11.4-dev"
 checkout="master"
 
 # Root permissions are required to run this script
@@ -325,10 +325,12 @@ logrotate -f /etc/logrotate.conf
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
     wget http://mirror.studio-connect.de/opus-1.0.3-1-armv7h.pkg.tar.xz
-    wget http://mirror.studio-connect.de/pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz
-    wget http://mirror.studio-connect.de/python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+    wget http://mirror.studio-connect.de/baresip-0.4.7-1-armv7h.pkg.tar.xz
+    wget http://mirror.studio-connect.de/libre-0.4.6-1-armv7h.pkg.tar.xz
+    wget http://mirror.studio-connect.de/librem-0.4.4-1-armv7h.pkg.tar.xz
     $pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
-    $pacman -U pygobject-devel-3.8.3-1-armv7h.pkg.tar.xz python2-gobject-3.8.3-1-armv7h.pkg.tar.xz
+    $pacman -U librem-0.4.4-1-armv7h.pkg.tar.xz libre-0.4.6-1-armv7h.pkg.tar.xz
+    $pacman -U baresip-0.4.7-1-armv7h.pkg.tar.xz
 fi
 
 # Starting Services
