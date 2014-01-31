@@ -331,6 +331,7 @@ if [ "$(uname -m)" == "armv7l" ]; then
     $pacman -U opus-1.0.3-1-armv7h.pkg.tar.xz
     $pacman -U librem-0.4.4-1-armv7h.pkg.tar.xz libre-0.4.6-1-armv7h.pkg.tar.xz
     $pacman -U baresip-0.4.7-1-armv7h.pkg.tar.xz
+    rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
 
 # Starting Services
