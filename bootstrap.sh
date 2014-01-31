@@ -337,3 +337,6 @@ fi
 systemctl start studio-webapp
 systemctl start studio-celery
 systemctl start studio-celery2
+
+# Flush filesystem buffers
+sync
