@@ -49,7 +49,6 @@ else
     redis-cli FLUSHALL
     systemctl stop studio-webapp
     systemctl stop studio-celery
-    systemctl stop studio-celery2
 fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
@@ -98,23 +97,12 @@ CPUShares=2048
 WantedBy=multi-user.target
 EOF
 
-cat > /etc/systemd/system/studio-celery2.service << EOF
-[Unit]
-Description=studio-celery2 worker
-After=syslog.target
-After=network.target
-
-[Service]
-Type=simple
-User=studio
-Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1
-WorkingDirectory=/opt/studio/webapp
-CPUShares=2048
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# REMOVE LEGACY celery2 SERVICE - 14.2.0-alpha
+if [ -f /etc/systemd/system/studio-celery2.service ]; then
+    systemctl stop studio-celery2
+    systemctl disable studio-celery2
+    rm /etc/systemd/system/studio-celery2.service
+fi
 
 cat > /etc/systemd/system/studio-beat.service << EOF
 [Unit]
@@ -276,14 +264,13 @@ systemctl enable redis
 systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
-systemctl enable studio-celery2
 systemctl enable studio-beat
 
 # Temporary disabling ip6tables until final version
 #systemctl enable ip6tables.service
 systemctl disable ip6tables.service
 
-# Sudo
+# sudo privileges
 cat > /etc/sudoers << EOF
 root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
@@ -335,7 +322,6 @@ fi
 # Starting Services
 systemctl start studio-webapp
 systemctl start studio-celery
-systemctl start studio-celery2
 
 # Flush filesystem buffers
 sync
