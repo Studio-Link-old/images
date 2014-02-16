@@ -219,6 +219,61 @@ cat > /etc/avahi/services/http.service << EOF
 </service-group>
 EOF
 
+cat > /etc/systemd/system/baresip.service << EOF
+[Unit]
+Description=baresip
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/usr/bin/baresip
+WorkingDirectory=/opt/studio/webapp
+CPUShares=2048
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+mkdir -p $home/.baresip
+
+cat > $home/.baresip << EOF
+poll_method             epoll
+input_device            /dev/event0
+input_port              5555
+sip_trans_bsize         128
+sip_listen              0.0.0.0:5060
+audio_player            alsa,plughw:0,0
+audio_source            alsa,plughw:0,0
+audio_alert             alsa,plughw:0,0
+audio_srate             8000-48000
+audio_channels          1-2
+rtp_tos                 184
+rtcp_enable             yes
+rtcp_mux                no
+jitter_buffer_delay     5-10
+rtp_stats               no
+module_path             /usr/lib/baresip/modules
+module                  stdio.so
+module                  httpd.so
+module                  opus.so
+module                  alsa.so
+module                  stun.so
+module                  turn.so
+module                  ice.so
+module_tmp              account.so
+module_app              auloop.so
+module_app              contact.so
+module_app              menu.so
+auloop_codec            opus
+EOF
+
+chown -R studio:studio $home/.baresip
+
 # Fix IPv6 avahi
 sed -i 's/use-ipv6=no/use-ipv6=yes/' /etc/avahi/avahi-daemon.conf
 
@@ -257,6 +312,8 @@ EOF
 
 chmod +x /etc/netctl/hooks/dhcpcd-timeout
 
+systemctl daemon-reload
+
 # Enable systemd start scripts
 systemctl enable nginx
 systemctl enable avahi-daemon
@@ -265,6 +322,7 @@ systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
 systemctl enable studio-beat
+systemctl enable baresip
 
 # Temporary disabling ip6tables until final version
 #systemctl enable ip6tables.service
@@ -322,6 +380,7 @@ fi
 # Starting Services
 systemctl start studio-webapp
 systemctl start studio-celery
+systemctl start baresip
 
 # Flush filesystem buffers
 sync
