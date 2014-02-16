@@ -241,7 +241,7 @@ EOF
 
 mkdir -p $home/.baresip
 
-cat > $home/.baresip << EOF
+cat > $home/.baresip/config << EOF
 poll_method             epoll
 input_device            /dev/event0
 input_port              5555
