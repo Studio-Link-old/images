@@ -104,23 +104,12 @@ if [ -f /etc/systemd/system/studio-celery2.service ]; then
     rm /etc/systemd/system/studio-celery2.service
 fi
 
-cat > /etc/systemd/system/studio-beat.service << EOF
-[Unit]
-Description=studio-beat
-After=syslog.target
-After=network.target
-
-[Service]
-Type=simple
-User=studio
-Group=studio
-ExecStart=/opt/studio/bin/celery beat --app=app -l info
-WorkingDirectory=/opt/studio/webapp
-CPUShares=100
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# REMOVE LEGACY beat SERVICE - 14.2.0-alpha
+if [ -f /etc/systemd/system/studio-beat.service ]; then
+    systemctl stop studio-beat
+    systemctl disable studio-beat
+    rm /etc/systemd/system/studio-beat.service
+fi
 
 cat > /etc/systemd/system/aiccu.service << EOF
 [Unit]
@@ -321,7 +310,6 @@ systemctl enable redis
 systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
-systemctl enable studio-beat
 systemctl enable baresip
 
 # Temporary disabling ip6tables until final version
