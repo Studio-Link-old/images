@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="14.2.0-alpha"
+version="14.2.1-alpha"
 checkout="master"
 
 # Root permissions are required to run this script
