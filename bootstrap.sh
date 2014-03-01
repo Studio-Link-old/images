@@ -26,8 +26,7 @@ fi
 # Install packages
 $pacman -Syu
 $pacman -S git vim ntp 
-$pacman -S nginx aiccu python2 python2-distribute avahi python2-gobject
-$pacman -S gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base gst-plugins-base-libs gst-plugins-bad gst-libav
+$pacman -S nginx aiccu python2 python2-distribute avahi
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
 # Create User and generate Virtualenv
@@ -72,7 +71,7 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.fcgi
+ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.wsgi
 CPUShares=100
 
 [Install]
@@ -150,20 +149,17 @@ http {
                 listen  [::]:80;
                 server_name  localhost;
 
-                location /api1/ {
-                        try_files \$uri @yourapplication; 
-                }
-
                 location / { 
                         auth_basic "Please Login";
                         auth_basic_user_file  /opt/studio/webapp/htpasswd;
-                        try_files \$uri @yourapplication; 
+                        try_files \$uri @studioapp;
                 }
-                location @yourapplication {
+
+                location @studioapp {
                         include fastcgi_params;
                         fastcgi_param PATH_INFO \$fastcgi_script_name;
                         fastcgi_param SCRIPT_NAME "";
-                        fastcgi_pass unix:/tmp/fcgi.sock;
+                        fastcgi_pass unix:/tmp/wsgi.sock;
                 }
 
                 error_page   500 502 503 504  /50x.html;
@@ -192,6 +188,7 @@ cat > /usr/share/nginx/html/50x.html << EOF
     <h1>Rebooting...</h1>
 
     <p>Please wait and retry a few seconds later.</p>
+    <p>Bitte warten, die Anwendung wird gerade neu gestartet.</p>
 </body>
 </html>
 EOF
