@@ -88,9 +88,9 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app -l info --concurrency=1 --purge
+ExecStart=/opt/studio/bin/celery worker --app=app.tasks -l info --concurrency=1 --purge
 WorkingDirectory=/opt/studio/webapp
-CPUShares=2048
+CPUShares=100
 
 [Install]
 WantedBy=multi-user.target
