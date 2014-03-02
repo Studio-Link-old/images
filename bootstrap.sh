@@ -150,16 +150,18 @@ http {
                 server_name  localhost;
 
                 location / { 
-                        auth_basic "Please Login";
-                        auth_basic_user_file  /opt/studio/webapp/htpasswd;
-                        try_files \$uri @studioapp;
+                    auth_basic "Please Login";
+                    auth_basic_user_file  /opt/studio/webapp/htpasswd;
+                    try_files \$uri @studioapp;
                 }
 
                 location @studioapp {
-                        include fastcgi_params;
-                        fastcgi_param PATH_INFO \$fastcgi_script_name;
-                        fastcgi_param SCRIPT_NAME "";
-                        fastcgi_pass unix:/tmp/wsgi.sock;
+                    proxy_pass         http://127.0.0.1:5000;
+                    proxy_redirect     off;
+
+                    proxy_set_header   Host             $host;
+                    proxy_set_header   X-Real-IP        $remote_addr;
+                    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
                 }
 
                 error_page   500 502 503 504  /50x.html;
