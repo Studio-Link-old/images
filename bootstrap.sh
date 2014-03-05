@@ -40,14 +40,15 @@ if [ $? == 1 ]; then
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
 else
+    systemctl stop studio-webapp
+    systemctl stop studio-celery
+    virtualenv2 --system-site-packages $home
     cd $home/webapp
     git pull
     git checkout -f $checkout
     git pull
     $home/bin/pip install -r $home/webapp/requirements.txt
     redis-cli FLUSHALL
-    systemctl stop studio-webapp
-    systemctl stop studio-celery
 fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
