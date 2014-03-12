@@ -9,7 +9,7 @@ checkout="master"
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
-    echoerror "Studio Connect Bootstrap requires root privileges to install. Please re-run this script as root."
+    echo "Error: Studio Connect Bootstrap requires root privileges to install. Please re-run this script as root."
     exit 1
 fi
 
