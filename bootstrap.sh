@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="14.2.1-alpha"
+version="14.3.0-dev"
 checkout="master"
 
 # Root permissions are required to run this script
@@ -19,14 +19,11 @@ cat > /etc/pacman.d/mirrorlist << EOF
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
-pacman --noconfirm -R linux-am33x-legacy
-$pacman -S linux-am33x
 fi
 
 # Install packages
 $pacman -Syu
-$pacman -S git vim ntp 
-$pacman -S nginx aiccu python2 python2-distribute avahi
+$pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
 # Create User and generate Virtualenv
@@ -53,6 +50,16 @@ fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
+fi
+
+# Cleanup old versions (13.x.x, 14.[1-2].x and before)
+if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ] || [ ! -f /etc/studio-release ]); then
+    cd $home/webapp
+    rm app.db
+    $home/bin/python -c "from app import db; db.create_all();"
+    pacman --noconfirm -R linux-am33x-legacy
+    $pacman -S linux-am33x
+    #@TODO: Uninstall packages
 fi
 
 chown -R studio:studio $home
