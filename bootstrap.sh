@@ -32,7 +32,7 @@ if [ $? == 1 ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
     virtualenv2 --system-site-packages $home
     git clone $repo $home/webapp
-    $home/bin/pip install pytz==2013.7
+    $home/bin/pip install pytz==2014.1
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
