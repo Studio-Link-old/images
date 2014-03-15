@@ -59,6 +59,8 @@ if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ] || [ ! -f /et
     $home/bin/python -c "from app import db; db.create_all();"
     pacman --noconfirm -R linux-am33x-legacy
     $pacman -S linux-am33x
+    $home/bin/pip install --upgrade pytz==2014.1
+    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     #@TODO: Uninstall packages
 fi
 
