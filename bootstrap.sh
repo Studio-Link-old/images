@@ -257,7 +257,7 @@ jitter_buffer_delay     5-10
 rtp_stats               no
 module_path             /usr/lib/baresip/modules
 module                  stdio.so
-module                  httpd.so
+module                  httpdsc.so
 module                  opus.so
 module                  alsa.so
 module                  stun.so
@@ -366,10 +366,10 @@ logrotate -f /etc/logrotate.conf
 # Bugfixing
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-100-armv7h.pkg.tar.xz
+    wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-101-armv7h.pkg.tar.xz
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-1-armv7h.pkg.tar.xz
+    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-2-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
