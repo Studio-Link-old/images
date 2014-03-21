@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="14.3.0-dev"
+version="14.3.0-dev3"
 checkout="master"
 
 # Root permissions are required to run this script
@@ -248,7 +248,7 @@ sip_listen              0.0.0.0:5060
 audio_player            alsa,plughw:0,0
 audio_source            alsa,plughw:0,0
 audio_alert             alsa,plughw:0,0
-audio_srate             8000-48000
+audio_srate             48000
 audio_channels          1-2
 rtp_tos                 184
 rtcp_enable             yes
