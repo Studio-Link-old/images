@@ -344,7 +344,11 @@ SystemMaxUse=10M
 EOF
 
 # Hostname
-post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | sed s/://g | cut -c 7-)
+if [ "$(uname -m)" == "armv7l" ]; then
+    post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | sed s/://g | cut -c 7-)
+else
+    post="dev"
+fi
 echo "studio-connect-$post" > /etc/hostname
 
 # Disable root account
@@ -368,7 +372,7 @@ if [ "$(uname -m)" == "armv7l" ]; then
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-101-armv7h.pkg.tar.xz
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-2-armv7h.pkg.tar.xz
+    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-3-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
