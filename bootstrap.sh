@@ -81,7 +81,7 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/python /opt/studio/webapp/app.wsgi
+ExecStart=/opt/studio/bin/gunicorn -w 3 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
 CPUShares=100
 
 [Install]
