@@ -23,7 +23,7 @@ fi
 
 # Install packages
 $pacman -Syu
-$pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi
+$pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
 # Create User and generate Virtualenv
