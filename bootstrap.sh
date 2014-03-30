@@ -248,7 +248,7 @@ sip_listen              0.0.0.0:5060
 audio_player            alsa,plughw:0,0
 audio_source            alsa,plughw:0,0
 audio_alert             alsa,plughw:0,0
-audio_srate             48000
+audio_srate             8000-48000
 audio_channels          1-2
 rtp_tos                 184
 rtcp_enable             yes
@@ -266,7 +266,6 @@ module_tmp              account.so
 module_app              auloop.so
 module_app              contact.so
 module_app              menu.so
-auloop_codec            opus
 EOF
 
 chown -R studio:studio $home/.baresip
