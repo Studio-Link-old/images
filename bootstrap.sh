@@ -69,7 +69,6 @@ if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ] || [ ! -f /et
     $pacman -S linux-am33x
     $home/bin/pip install --upgrade pytz==2014.1
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
-    #@TODO: Uninstall packages
 fi
 
 chown -R studio:studio $home
@@ -166,6 +165,8 @@ http {
                 listen  80;
                 listen  [::]:80;
                 server_name  localhost;
+
+                access_log off;
 
                 location / { 
                     auth_basic "Please Login";
