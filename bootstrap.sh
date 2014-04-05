@@ -364,7 +364,9 @@ echo "studio-connect-$post" > /etc/hostname
 passwd -l root
 
 # Set timezone
-timedatectl set-timezone Europe/Berlin
+if ([ ! -f /etc/studio-release ]); then
+    timedatectl set-timezone Europe/Berlin
+fi
 
 # Cleanup
 $pacman -Scc
