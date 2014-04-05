@@ -4,7 +4,7 @@
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="14.3.0-dev4"
+version="14.4.0-alpha"
 checkout="master"
 
 # Root permissions are required to run this script
@@ -21,10 +21,18 @@ Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
 fi
 
+# Remove old packages
+$pacman -Scc
+pacman --noconfirm -R gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base \
+    gst-plugins-base-libs gst-plugins-bad gst-libav python2-gobject
+
 # Install packages
 $pacman -Syu
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
+
+# Baresip requirements (codecs)
+$pacman -S spandsp gsm
 
 # Create User and generate Virtualenv
 id studio
@@ -339,7 +347,7 @@ fi
 # Limit systemd journal
 cat > /etc/systemd/journald.conf << EOF
 [Journal]
-SystemMaxUse=10M
+SystemMaxUse=20M
 EOF
 
 # Hostname
@@ -382,4 +390,7 @@ systemctl start studio-celery
 systemctl start baresip
 
 # Flush filesystem buffers
-sync
+echo "Syncing filesystem..."
+sync; sleep 5; sync
+
+echo "*** Bootstrap finished! Please reboot now! ***"
