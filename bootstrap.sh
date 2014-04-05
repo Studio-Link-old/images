@@ -22,7 +22,7 @@ EOF
 fi
 
 # Remove old packages
-$pacman -Scc
+yes | pacman -Scc
 pacman --noconfirm -R gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base \
     gst-plugins-base-libs gst-plugins-bad gst-libav python2-gobject
 
@@ -369,7 +369,7 @@ if ([ ! -f /etc/studio-release ]); then
 fi
 
 # Cleanup
-$pacman -Scc
+yes | pacman -Scc
 
 # Update Version
 echo $version > /etc/studio-release
@@ -396,5 +396,9 @@ systemctl start baresip
 # Flush filesystem buffers
 echo "Syncing filesystem..."
 sync; sleep 5; sync
+
+# Bugfix: sometimes kernel boot after big update not work
+pacman --noconfirm --force -S linux-am33x
+sync
 
 echo "*** Bootstrap finished! Please reboot now! ***"
