@@ -83,6 +83,7 @@ cat > /etc/systemd/system/studio-webapp.service << EOF
 Description=studio-webapp fastcgi
 After=syslog.target
 After=network.target
+After=redis.service
 
 [Service]
 Type=simple
