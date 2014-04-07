@@ -5,7 +5,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 version="14.4.0-alpha"
-checkout="14.4.0-alpha"
+checkout="devel"
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
