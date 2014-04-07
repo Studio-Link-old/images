@@ -5,7 +5,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 version="14.4.0-alpha"
-checkout="master"
+checkout="14.4.0-alpha"
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
@@ -89,7 +89,8 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/bin/gunicorn -w 3 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
-CPUShares=100
+ExecStartPost=/usr/bin/redis-cli flushall
+CPUShares=200
 
 [Install]
 WantedBy=multi-user.target
@@ -397,8 +398,10 @@ systemctl start baresip
 echo "Syncing filesystem..."
 sync; sleep 5; sync
 
-# Bugfix: sometimes kernel boot after big update not work
-pacman --noconfirm --force -S linux-am33x
-sync
+if [ "$(uname -m)" == "armv7l" ]; then
+    # Bugfix: sometimes kernel boot after big update not work
+    pacman --noconfirm --force -S linux-am33x
+    sync
+fi
 
 echo "*** Bootstrap finished! Please reboot now! ***"
