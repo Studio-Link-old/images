@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# Exit on non-zero return codes
+set -e
+
 # VARS
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
-version="14.4.0-alpha"
+version="14.4.1-alpha"
 checkout="devel"
 
 # Root permissions are required to run this script
@@ -24,20 +27,25 @@ if [ $disk_free < 300 ]; then
 fi
 
 if [ "$(uname -m)" == "armv7l" ]; then
-# Update Mirrorlist
-cat > /etc/pacman.d/mirrorlist << EOF
+    # Update Mirrorlist
+    cat > /etc/pacman.d/mirrorlist << EOF
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
 fi
 
-# Remove old packages
-yes | pacman -Scc
-pacman --noconfirm -R gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base \
-    gst-plugins-base-libs gst-plugins-bad gst-libav python2-gobject
+if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ]); then
+    pacman --noconfirm -R gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base \
+        gst-plugins-base-libs gst-plugins-bad gst-libav python2-gobject gobject-introspection
+fi
+
+# Upgrade packages
+$pacman -Syu
+sync
+
+## 50%
 
 # Install packages
-$pacman -Syu
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 
@@ -45,8 +53,7 @@ $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
 $pacman -S spandsp gsm
 
 # Create User and generate Virtualenv
-id studio
-if [ $? == 1 ]; then
+if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
     virtualenv2 --system-site-packages $home
     git clone $repo $home/webapp
@@ -86,6 +93,8 @@ chmod 755 $home
 gpasswd -a studio audio
 gpasswd -a studio video
 mkdir -p $home/logs
+
+## 90%
 
 # Deploy configs
 cat > /etc/systemd/system/studio-webapp.service << EOF
@@ -342,7 +351,6 @@ systemctl enable studio-celery
 systemctl enable baresip
 
 # Temporary disabling ip6tables until final version
-#systemctl enable ip6tables.service
 systemctl disable ip6tables.service
 
 # sudo privileges
@@ -408,11 +416,5 @@ systemctl start baresip
 # Flush filesystem buffers
 echo "Syncing filesystem..."
 sync; sleep 5; sync
-
-if [ "$(uname -m)" == "armv7l" ]; then
-    # Bugfix: sometimes kernel boot after big update not work
-    pacman --noconfirm --force -S linux-am33x
-    sync
-fi
 
 echo "*** Bootstrap finished! Please reboot now! ***"
