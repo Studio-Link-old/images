@@ -20,7 +20,7 @@ fi
 yes | pacman -Scc
 
 # Check disk usage
-disk_free=`df -m / | awk '{ print $4 }'`
+disk_free=`df -m / | awk '{ print $4 }' | tail -1`
 if [ $disk_free -lt 300 ]; then
     echo "Not enough free disk space [only ${disk_free} MByte free]"
     exit 1
