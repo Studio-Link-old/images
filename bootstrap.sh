@@ -401,9 +401,9 @@ logrotate -f /etc/logrotate.conf
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
+    wget https://github.com/studio-connect/PKGBUILDs/raw/master/libre/libre-0.4.8-1-armv7h.pkg.tar.xz
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-3-armv7h.pkg.tar.xz
+    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-14.4.1-1-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
