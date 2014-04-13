@@ -41,7 +41,6 @@ fi
 
 # Upgrade packages
 $pacman -Syu
-sync
 
 ## 50%
 
