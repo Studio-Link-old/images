@@ -61,8 +61,10 @@ if [ ! -d $home ]; then
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
 else
-    systemctl stop studio-webapp
-    systemctl stop studio-celery
+    if [ -f /etc/systemd/system/studio-webapp.service ]; then
+        systemctl stop studio-webapp
+        systemctl stop studio-celery
+    fi
     virtualenv2 --system-site-packages $home
     cd $home/webapp
     git pull
@@ -358,10 +360,14 @@ studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
 if [ "$(uname -m)" == "armv7l" ]; then
-# Mount Options (noatime)
-cat > /etc/fstab << EOF
-/dev/mmcblk0p2 / ext4 defaults,noatime,nodiratime 0 1
+    # Only write fstab if no sdcard
+    if [ ! "$(blkid /dev/mmcblk1p2)" ]; then
+        uuid=`blkid -o value -s UUID /dev/mmcblk0p2`
+        # Mount Options (noatime)
+        cat > /etc/fstab << EOF
+UUID=$uuid / ext4 defaults,noatime,nodiratime 0 1
 EOF
+    fi
 fi
 
 # Limit systemd journal
@@ -382,7 +388,7 @@ echo "studio-connect-$post" > /etc/hostname
 passwd -l root
 
 # Set timezone
-if ([ ! -f /etc/studio-release ]); then
+if [ ! -f /etc/studio-release ]; then
     timedatectl set-timezone Europe/Berlin
 fi
 
@@ -395,7 +401,6 @@ echo $version > /etc/studio-release
 # Logrotate (mostly nginx logs)
 logrotate -f /etc/logrotate.conf
 
-# Bugfixing
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
     wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-101-armv7h.pkg.tar.xz
