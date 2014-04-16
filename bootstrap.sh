@@ -411,6 +411,7 @@ if [ "$(uname -m)" == "armv7l" ]; then
 fi
 
 # Starting Services
+systemctl start redis
 systemctl start studio-webapp
 systemctl start studio-celery
 systemctl start baresip
