@@ -71,7 +71,6 @@ else
     git checkout -f $checkout
     git pull
     $home/bin/pip install -r $home/webapp/requirements.txt
-    redis-cli FLUSHALL
 fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
