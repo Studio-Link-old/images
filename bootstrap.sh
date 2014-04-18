@@ -1,4 +1,13 @@
 #!/bin/bash
+# +--------------------------------------------------------------------------+
+# |   _____ __            ___          ______                            __  |
+# |  / ___// /___  ______/ (_)___     / ____/___  ____  ____  ___  _____/ /_ |
+# |  \__ \/ __/ / / / __  / / __ \   / /   / __ \/ __ \/ __ \/ _ \/ ___/ __/ |
+# | ___/ / /_/ /_/ / /_/ / / /_/ /  / /___/ /_/ / / / / / / /  __/ /__/ /_   |
+# |/____/\__/\__,_/\__,_/_/\____/   \____/\____/_/ /_/_/ /_/\___/\___/\__/   |
+# |Copyright Sebastian Reimers 2013 - 2014 studio-connect.de                 |
+# |License: BSD-2-Clause (see LICENSE File)                                  |
+# +--------------------------------------------------------------------------+
 
 # Exit on non-zero return codes
 set -e
@@ -7,6 +16,7 @@ set -e
 pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
+pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
 version="14.4.1-alpha"
 checkout="devel"
 
@@ -65,7 +75,14 @@ else
         systemctl stop studio-webapp
         systemctl stop studio-celery
     fi
-    virtualenv2 --system-site-packages $home
+    
+    # Upgrade Virtualenv
+    python2_org_md5=$(md5sum /usr/bin/python2.7)
+    python2_env_md5=$(md5sum $home/bin/python2)
+    if [ "$python2_org_md5" != "$python2_env_md5" ]; then
+        virtualenv2 --system-site-packages $home
+    fi
+
     cd $home/webapp
     git pull
     git checkout -f $checkout
@@ -361,7 +378,7 @@ EOF
 if [ "$(uname -m)" == "armv7l" ]; then
     # Only write fstab if no sdcard
     if [ ! "$(blkid /dev/mmcblk1p2)" ]; then
-        uuid=`blkid -o value -s UUID /dev/mmcblk0p2`
+        uuid=$(blkid -o value -s UUID /dev/mmcblk0p2)
         # Mount Options (noatime)
         cat > /etc/fstab << EOF
 UUID=$uuid / ext4 defaults,noatime,nodiratime 0 1
@@ -402,10 +419,10 @@ logrotate -f /etc/logrotate.conf
 
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
-    wget https://github.com/studio-connect/PKGBUILDs/raw/master/baresip/baresip-0.4.10-3-armv7h.pkg.tar.xz
+    wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
+    wget $pkg_url/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
+    wget $pkg_url/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
+    wget $pkg_url/baresip/baresip-0.4.10-3-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
