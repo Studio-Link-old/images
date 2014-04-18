@@ -355,6 +355,15 @@ EOF
 
 chmod +x /etc/netctl/hooks/dhcpcd-timeout
 
+
+cat > /etc/modules-load.d/studio.conf << EOF
+g_audio
+EOF
+
+cat > /etc/modprobe.d/studio.conf << EOF
+options g_audio iProduct=StudioConnect
+EOF
+
 systemctl daemon-reload
 
 # Enable systemd start scripts
