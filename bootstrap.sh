@@ -77,8 +77,8 @@ else
     fi
     
     # Upgrade Virtualenv
-    python2_org_md5=$(md5sum /usr/bin/python2.7)
-    python2_env_md5=$(md5sum $home/bin/python2)
+    python2_org_md5=$(md5sum /usr/bin/python2.7 | awk '{ print $1 }')
+    python2_env_md5=$(md5sum $home/bin/python2 | awk '{ print $1 }')
     if [ "$python2_org_md5" != "$python2_env_md5" ]; then
         virtualenv2 --system-site-packages $home
     fi
