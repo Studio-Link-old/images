@@ -18,7 +18,7 @@ home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
 version="14.4.1-alpha"
-checkout="devel"
+checkout="master"
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
