@@ -84,9 +84,9 @@ else
     fi
 
     cd $home/webapp
+    git checkout master
     git pull
     git checkout -f $checkout
-    git pull
     $home/bin/pip install -r $home/webapp/requirements.txt
 fi
 
