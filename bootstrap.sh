@@ -18,7 +18,7 @@ home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
 version="14.4.1-alpha"
-checkout="14.4.1-alpha"
+checkout="devel"
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
@@ -234,7 +234,7 @@ cat > /usr/share/nginx/html/50x.html << EOF
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Rebooting</title>
+    <title>Rebooting/Upgrading</title>
     <style>
         body {
         width: 35em;
@@ -244,7 +244,7 @@ cat > /usr/share/nginx/html/50x.html << EOF
     </style>
 </head>
 <body>
-    <h1>Rebooting...</h1>
+    <h1>Rebooting/Upgrading...</h1>
 
     <p>Please wait and retry a few seconds later.</p>
     <p>Bitte warten, die Anwendung wird gerade neu gestartet.</p>
@@ -354,6 +354,32 @@ TimeoutDHCP=40
 EOF
 
 chmod +x /etc/netctl/hooks/dhcpcd-timeout
+
+cat > /etc/systemd/system/studio-update.service << EOF
+[Unit]
+Description=studio-update
+After=syslog.target
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/opt/studio/bin/studio-update.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /opt/studio/bin/studio-update.sh << EOF
+#!/bin/bash
+version=\$(/usr/bin/redis-cli get next_release)
+if [ \$version ]; then
+    curl https://raw.github.com/studio-connect/images/\$version/bootstrap.sh | bash
+fi
+EOF
+
+chmod +x /opt/studio/bin/studio-update.sh
 
 # DISABLED (baresip audio problems)
 #cat > /etc/modules-load.d/studio.conf << EOF
