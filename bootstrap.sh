@@ -19,6 +19,18 @@ repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
 version="14.4.1-alpha"
 checkout="devel"
+update_docroot="/tmp/update"
+
+update_status() {
+    mkdir -p $update_docroot
+    curl https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html
+}
+
+update_status 0 # 0%
+systemctl stop nginx
+cd $update_docroot
+python2 -m SimpleHTTPServer 80 &
+http_pid=$!
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
@@ -28,6 +40,8 @@ fi
 
 # Cleanup pacman cache
 yes | pacman -Scc
+
+update_status 10 # 10%
 
 # Check disk usage
 disk_free=`df -m / | awk '{ print $4 }' | tail -1`
@@ -52,7 +66,7 @@ fi
 # Upgrade packages
 $pacman -Syu
 
-## 50%
+update_status 50 # 50%
 
 # Install packages
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
@@ -110,7 +124,7 @@ gpasswd -a studio audio
 gpasswd -a studio video
 mkdir -p $home/logs
 
-## 90%
+update_status 90 # 90%
 
 # Deploy configs
 cat > /etc/systemd/system/studio-webapp.service << EOF
@@ -467,8 +481,13 @@ systemctl start studio-webapp
 systemctl start studio-celery
 systemctl start baresip
 
+update_status 95 # 95%
+
 # Flush filesystem buffers
 echo "Syncing filesystem..."
 sync; sleep 5; sync
 
+kill $http_pid
+sleep 2 
+systemctl start nginx
 echo "*** Bootstrap finished! Please reboot now! ***"
