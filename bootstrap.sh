@@ -29,7 +29,7 @@ update_status() {
 update_status 0 # 0%
 systemctl stop nginx
 cd $update_docroot
-python2 -m SimpleHTTPServer 80 &
+python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
 
 # Root permissions are required to run this script
