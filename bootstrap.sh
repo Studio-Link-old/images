@@ -459,9 +459,6 @@ fi
 # Cleanup
 yes | pacman -Scc
 
-# Update Version
-echo $version > /etc/studio-release
-
 # Logrotate (mostly nginx logs)
 logrotate -f /etc/logrotate.conf
 
@@ -490,4 +487,8 @@ sync; sleep 5; sync
 kill $http_pid
 sleep 2 
 systemctl start nginx
+
+# Update Version
+echo $version > /etc/studio-release
+
 echo "*** Bootstrap finished! Please reboot now! ***"
