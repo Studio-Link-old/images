@@ -310,6 +310,8 @@ audio_player            alsa,plughw:0,0
 audio_source            alsa,plughw:0,0
 audio_alert             alsa,plughw:0,0
 audio_srate             8000-48000
+ausrc_srate             48000
+auplay_srate            48000
 audio_channels          1-2
 rtp_tos                 184
 rtcp_enable             yes
