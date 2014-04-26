@@ -23,7 +23,7 @@ update_docroot="/tmp/update"
 
 update_status() {
     mkdir -p $update_docroot
-    curl https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html
+    curl -L https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html
 }
 
 update_status 0 # 0%
@@ -391,7 +391,7 @@ cat > /opt/studio/bin/studio-update.sh << EOF
 #!/bin/bash
 version=\$(/usr/bin/redis-cli get next_release)
 if [ \$version ]; then
-    curl https://raw.github.com/studio-connect/images/\$version/bootstrap.sh | bash
+    curl -L https://raw.github.com/studio-connect/images/\$version/bootstrap.sh | bash
 fi
 EOF
 
