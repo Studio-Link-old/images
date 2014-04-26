@@ -17,7 +17,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
-version="14.4.1-alpha"
+version="14.4.2-alpha"
 checkout="devel"
 update_docroot="/tmp/update"
 
@@ -101,6 +101,9 @@ else
     git checkout master
     git pull
     git checkout -f $checkout
+    if [ "$checkout" == "devel" ]; then
+        git pull
+    fi
     $home/bin/pip install -r $home/webapp/requirements.txt
 fi
 
