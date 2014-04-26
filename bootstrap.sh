@@ -18,7 +18,7 @@ home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
 version="14.4.2-alpha"
-checkout="devel"
+checkout="14.4.2-alpha"
 update_docroot="/tmp/update"
 
 update_status() {
