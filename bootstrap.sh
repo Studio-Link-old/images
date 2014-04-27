@@ -478,14 +478,18 @@ if [ "$(uname -m)" == "armv7l" ]; then
 fi
 
 # Add Audio files
-if [ ! -f /usr/local/share/baresip/ring.wav ]; then
-    mkdir -p /usr/local/share/baresip
-    cd /usr/local/share/baresip/
-    wget http://mirror.studio-connect.de/music/busy.wav
-    wget http://mirror.studio-connect.de/music/error.wav
-    wget http://mirror.studio-connect.de/music/message.wav
-    wget http://mirror.studio-connect.de/music/ring.wav
-    wget http://mirror.studio-connect.de/music/ringback.wav
+#if [ ! -f /usr/local/share/baresip/ring.wav ]; then
+#    mkdir -p /usr/local/share/baresip
+#    cd /usr/local/share/baresip/
+#    wget http://mirror.studio-connect.de/music/busy.wav
+#    wget http://mirror.studio-connect.de/music/error.wav
+#    wget http://mirror.studio-connect.de/music/message.wav
+#    wget http://mirror.studio-connect.de/music/ring.wav
+#    wget http://mirror.studio-connect.de/music/ringback.wav
+#fi
+
+if [ -f /usr/local/share/baresip/ring.wav ]; then
+    rm -Rf /usr/local/share/baresip
 fi
 
 # Starting Services
