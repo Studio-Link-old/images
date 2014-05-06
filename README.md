@@ -14,7 +14,7 @@ If you're looking for the *one-liner* to install...
 
 ## Update to Tags
 
-```curl -L https://raw.github.com/studio-connect/images/13.11.1-dev/bootstrap.sh | bash```
+```curl -L https://raw.github.com/studio-connect/images/14.4.3-alpha/bootstrap.sh | bash```
 
 ## Update to Branches
 
