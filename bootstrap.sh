@@ -17,8 +17,8 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
-version="14.4.3-alpha"
-checkout="14.4.3-alpha"
+version="14.5.0-alpha"
+checkout="devel"
 update_docroot="/tmp/update"
 
 update_status() {
@@ -76,7 +76,7 @@ if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
     virtualenv2 --system-site-packages $home
     git clone $repo $home/webapp
-    $home/bin/pip install pytz==2014.2
+    $home/bin/pip install pytz==2014.3
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
