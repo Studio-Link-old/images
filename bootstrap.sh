@@ -23,7 +23,7 @@ update_docroot="/tmp/update"
 
 update_status() {
     mkdir -p $update_docroot
-    curl -L https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
+    curl -L https://raw.githubusercontent.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
     mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
 
@@ -366,7 +366,7 @@ cat > /opt/studio/bin/studio-update.sh << EOF
 #!/bin/bash
 version=\$(/usr/bin/redis-cli get next_release)
 if [ \$version ]; then
-    curl -L https://raw.github.com/studio-connect/images/\$version/bootstrap.sh | bash
+    curl -L https://raw.githubusercontent.com/studio-connect/images/\$version/bootstrap.sh | bash
 fi
 EOF
 
@@ -393,6 +393,11 @@ systemctl enable baresip
 
 # Temporary disabling ip6tables until final version
 systemctl disable ip6tables.service
+
+# Disable mandb cache daily cron
+systemctl stop man-db.timer
+systemctl disable man-db.timer
+systemctl mask man-db.timer
 
 # sudo privileges
 cat > /etc/sudoers << EOF
