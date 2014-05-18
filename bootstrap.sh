@@ -23,20 +23,21 @@ update_docroot="/tmp/update"
 
 update_status() {
     mkdir -p $update_docroot
-    curl -L https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html
+    curl -L https://raw.github.com/studio-connect/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
+    mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
-
-update_status 0 # 0%
-systemctl stop nginx
-cd $update_docroot
-python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
-http_pid=$!
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
     echo "Error: Studio Connect Bootstrap requires root privileges to install. Please re-run this script as root."
     exit 1
 fi
+
+update_status 0 # 0%
+systemctl stop nginx
+cd $update_docroot
+python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
+http_pid=$!
 
 # Cleanup pacman cache
 yes | pacman -Scc
@@ -56,11 +57,6 @@ if [ "$(uname -m)" == "armv7l" ]; then
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
-fi
-
-if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ]); then
-    pacman --noconfirm -R gstreamer gst-plugins-ugly gst-plugins-good gst-plugins-base \
-        gst-plugins-base-libs gst-plugins-bad gst-libav python2-gobject gobject-introspection
 fi
 
 # Upgrade packages
@@ -111,16 +107,6 @@ if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
 fi
 
-# Cleanup old versions (13.x.x, 14.[1-2].x and before)
-if ([ "$(grep -E "^(13\.|14\.1\.|14\.2\.)" /etc/studio-release)" ] || [ ! -f /etc/studio-release ]); then
-    cd $home/webapp
-    rm app.db
-    $home/bin/python -c "from app import db; db.create_all();"
-    $pacman -S linux-am33x
-    $home/bin/pip install --upgrade pytz==2014.2
-    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
-fi
-
 chown -R studio:studio $home
 chmod 755 $home
 gpasswd -a studio audio
@@ -166,20 +152,6 @@ CPUShares=100
 [Install]
 WantedBy=multi-user.target
 EOF
-
-# REMOVE LEGACY celery2 SERVICE - 14.2.0-alpha
-if [ -f /etc/systemd/system/studio-celery2.service ]; then
-    systemctl stop studio-celery2
-    systemctl disable studio-celery2
-    rm /etc/systemd/system/studio-celery2.service
-fi
-
-# REMOVE LEGACY beat SERVICE - 14.2.0-alpha
-if [ -f /etc/systemd/system/studio-beat.service ]; then
-    systemctl stop studio-beat
-    systemctl disable studio-beat
-    rm /etc/systemd/system/studio-beat.service
-fi
 
 cat > /etc/systemd/system/aiccu.service << EOF
 [Unit]
