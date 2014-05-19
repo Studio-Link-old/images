@@ -447,9 +447,9 @@ logrotate -f /etc/logrotate.conf
 if [ "$(uname -m)" == "armv7l" ]; then
     cd /tmp
     wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget $pkg_url/libre/libre-0.4.7-1-armv7h.pkg.tar.xz
+    wget $pkg_url/libre/libre-0.4.8-1-armv7h.pkg.tar.xz
     wget $pkg_url/librem/librem-0.4.5-1-armv7h.pkg.tar.xz
-    wget $pkg_url/baresip/baresip-0.4.10-3-armv7h.pkg.tar.xz
+    wget $pkg_url/baresip/baresip-14.5.0-1-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
