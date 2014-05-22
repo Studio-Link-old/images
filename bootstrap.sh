@@ -84,6 +84,7 @@ else
     if [ -f /etc/systemd/system/studio-webapp.service ]; then
         systemctl stop studio-webapp
         systemctl stop studio-celery
+        systemctl stop baresip
     fi
     
     # Upgrade Virtualenv
@@ -105,6 +106,14 @@ fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
+fi
+
+# One-time
+if [ "$(grep -E "^14\.4" /etc/studio-release)" ]; then
+	cd $home/webapp
+	rm app.db
+	$home/bin/python -c "from app import db; db.create_all();"
+	$home/bin/pip install --upgrade pytz==2014.3
 fi
 
 chown -R studio:studio $home
@@ -474,6 +483,16 @@ systemctl start redis
 systemctl start studio-webapp
 systemctl start studio-celery
 systemctl start baresip
+
+# Studio Connect provisioning
+
+hash=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | awk '{ print $1 }')
+
+wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt
+if [ -s /tmp/provisioning.txt ]; then
+	cd /opt/studio/webapp
+	/opt/studio/bin/celery call --app=app.tasks app.tasks.provisioning
+fi
 
 update_status 95 # 95%
 
