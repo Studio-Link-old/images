@@ -275,6 +275,7 @@ Group=studio
 ExecStart=/usr/bin/baresip
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
+TimeoutStopSec=20
 Restart=always
 RestartSec=5
 
