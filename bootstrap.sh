@@ -488,7 +488,7 @@ systemctl start baresip
 
 hash=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | awk '{ print $1 }')
 
-wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt
+wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt || true
 if [ -s /tmp/provisioning.txt ]; then
 	cd /opt/studio/webapp
 	/opt/studio/bin/celery call --app=app.tasks app.tasks.provisioning
