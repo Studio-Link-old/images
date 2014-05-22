@@ -154,7 +154,7 @@ After=network.target
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/celery worker --app=app.tasks -l info --concurrency=1 --purge
+ExecStart=/opt/studio/bin/celery worker --app=app.tasks -l info --concurrency=1
 WorkingDirectory=/opt/studio/webapp
 CPUShares=100
 
@@ -480,8 +480,8 @@ fi
 
 # Starting Services
 systemctl start redis
-systemctl start studio-webapp
 systemctl start studio-celery
+systemctl start studio-webapp
 systemctl start baresip
 
 # Studio Connect provisioning
