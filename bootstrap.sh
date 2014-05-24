@@ -262,6 +262,28 @@ cat > /etc/avahi/services/http.service << EOF
 </service-group>
 EOF
 
+cat > /etc/nsswitch.conf << EOF
+# Begin /etc/nsswitch.conf
+
+passwd: files
+group: files
+shadow: files
+
+publickey: files
+
+hosts: files mdns_minimal [NOTFOUND=return] dns myhostname
+networks: files
+
+protocols: files
+services: files
+ethers: files
+rpc: files
+
+netgroup: files
+
+# End /etc/nsswitch.conf
+EOF
+
 cat > /etc/systemd/system/baresip.service << EOF
 [Unit]
 Description=baresip
