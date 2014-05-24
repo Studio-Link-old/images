@@ -289,6 +289,7 @@ cat > /etc/systemd/system/baresip.service << EOF
 Description=baresip
 After=syslog.target
 After=network.target
+After=ntpdate.service
 
 [Service]
 Type=simple
