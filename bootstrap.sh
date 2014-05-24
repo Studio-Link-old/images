@@ -301,19 +301,32 @@ audio_channels          1-2
 rtp_tos                 184
 rtcp_enable             yes
 rtcp_mux                no
-jitter_buffer_delay     5-10
+jitter_buffer_delay     1-5
 rtp_stats               no
 module_path             /usr/lib/baresip/modules
 module                  httpdsc.so
+# Audio codec Modules (in order) {
 module                  opus.so
+module                  g722.so
+module                  g726.so
+module                  g711.so
+module                  gsm.so
+module                  l16.so
+# }
 module                  alsa.so
 module                  stun.so
 module                  turn.so
 module                  ice.so
+module_tmp              uuid.so
 module_tmp              account.so
 module_app              auloop.so
 module_app              contact.so
 module_app              menu.so
+ice_turn                yes
+ice_debug               yes
+ice_nomination          regular # {regular,aggressive}
+ice_mode                full    # {full,lite}
+opus_bitrate            64000
 EOF
 
 chown -R studio:studio $home/.baresip
