@@ -545,3 +545,4 @@ systemctl start nginx
 echo $version > /etc/studio-release
 
 echo "*** Bootstrap finished! Please reboot now! ***"
+/usr/bin/redis-cli set reboot_required true
