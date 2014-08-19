@@ -1,11 +1,11 @@
 #!/bin/bash
 # +--------------------------------------------------------------------------+
-# |   _____ __            ___          ______                            __  |
-# |  / ___// /___  ______/ (_)___     / ____/___  ____  ____  ___  _____/ /_ |
-# |  \__ \/ __/ / / / __  / / __ \   / /   / __ \/ __ \/ __ \/ _ \/ ___/ __/ |
-# | ___/ / /_/ /_/ / /_/ / / /_/ /  / /___/ /_/ / / / / / / /  __/ /__/ /_   |
-# |/____/\__/\__,_/\__,_/_/\____/   \____/\____/_/ /_/_/ /_/\___/\___/\__/   |
-# |Copyright Sebastian Reimers 2013 - 2014 studio-connect.de                 |
+# |   _____ __            ___          __    _       __                      |
+# |  / ___// /___  ______/ (_)___     / /   (_)___  / /__                    |
+# |  \__ \/ __/ / / / __  / / __ \   / /   / / __ \/ //_/                    |
+# | ___/ / /_/ /_/ / /_/ / / /_/ /  / /___/ / / / / ,<                       |
+# |/____/\__/\__,_/\__,_/_/\____/  /_____/_/_/ /_/_/|_|                      |
+# |Copyright Sebastian Reimers 2013 - 2014 studio-link.de                    |
 # |License: BSD-2-Clause (see LICENSE File)                                  |
 # +--------------------------------------------------------------------------+
 
@@ -17,8 +17,8 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
-version="14.5.0-alpha"
-checkout="14.5.0-alpha"
+version="14.8.0-alpha"
+checkout="master"
 update_docroot="/tmp/update"
 
 update_status() {
@@ -66,7 +66,7 @@ update_status 50 # 50%
 
 # Install packages
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
-$pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo
+$pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-hwclock
 
 # Baresip requirements (codecs)
 $pacman -S spandsp gsm
@@ -76,7 +76,7 @@ if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
     virtualenv2 --system-site-packages $home
     git clone $repo $home/webapp
-    $home/bin/pip install pytz==2014.3
+    $home/bin/pip install pytz==2014.4
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
@@ -109,11 +109,11 @@ if [ ! -f $home/webapp/htpasswd ]; then
 fi
 
 # One-time
-if [ "$(grep -E "^14\.4" /etc/studio-release)" ]; then
+if [ "$(grep -E "^14\.5" /etc/studio-release)" ]; then
 	cd $home/webapp
-	rm app.db
-	$home/bin/python -c "from app import db; db.create_all();"
-	$home/bin/pip install --upgrade pytz==2014.3
+	$home/bin/pip install --upgrade pytz==2014.4
+	$home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+	sync
 fi
 
 chown -R studio:studio $home
@@ -412,7 +412,7 @@ cat > /opt/studio/bin/studio-update.sh << EOF
 #!/bin/bash
 version=\$(/usr/bin/redis-cli get next_release)
 if [ \$version ]; then
-    curl -L https://raw.githubusercontent.com/studio-connect/images/\$version/bootstrap.sh | bash
+    curl -L https://raw.githubusercontent.com/studio-link/images/\$version/bootstrap.sh | bash
 fi
 EOF
 
@@ -436,6 +436,7 @@ systemctl enable ntpdate
 systemctl enable studio-webapp
 systemctl enable studio-celery
 systemctl enable baresip
+systemctl enable fake-hwclock
 
 # Temporary disabling ip6tables until final version
 systemctl disable ip6tables.service
@@ -474,7 +475,7 @@ if [ "$(uname -m)" == "armv7l" ]; then
 else
     post="dev"
 fi
-echo "studio-connect-$post" > /etc/hostname
+echo "studio-link-$post" > /etc/hostname
 
 # Disable root account
 passwd -l root
@@ -545,3 +546,4 @@ systemctl start nginx
 echo $version > /etc/studio-release
 
 echo "*** Bootstrap finished! Please reboot now! ***"
+/usr/bin/redis-cli set reboot_required true
