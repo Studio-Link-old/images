@@ -522,8 +522,7 @@ systemctl start studio-celery
 systemctl start studio-webapp
 systemctl start baresip
 
-# Studio Connect provisioning
-
+# Provisioning
 hash=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | awk '{ print $1 }')
 
 wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt || true
