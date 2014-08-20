@@ -42,6 +42,11 @@ http_pid=$!
 # Cleanup pacman cache
 yes | pacman -Scc
 
+# Remove corrupt systemd journal files
+systemctl stop systemd-journald
+find /var/log/journal -name "*.journal~" -exec rm {} \;
+systemctl start systemd-journald
+
 update_status 10 # 10%
 
 # Check disk usage
