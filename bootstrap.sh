@@ -527,13 +527,14 @@ systemctl start studio-celery
 systemctl start studio-webapp
 systemctl start baresip
 
-# Provisioning
-hash=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | awk '{ print $1 }')
-
-wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt || true
-if [ -s /tmp/provisioning.txt ]; then
-	cd /opt/studio/webapp
-	/opt/studio/bin/celery call --app=app.tasks app.tasks.provisioning
+if [ ! -f /etc/studio-link-community ]; then
+	# Provisioning
+	hash=$(ip link show eth0 | grep ether | awk '{ print $2 }' | md5sum | awk '{ print $1 }')
+	wget https://server.visr.de/provisioning/$hash.txt -O /tmp/provisioning.txt || true
+	if [ -s /tmp/provisioning.txt ]; then
+		cd /opt/studio/webapp
+		/opt/studio/bin/celery call --app=app.tasks app.tasks.provisioning
+	fi
 fi
 
 update_status 95 # 95%
