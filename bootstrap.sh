@@ -55,7 +55,7 @@ if [ $disk_free -lt 300 ]; then
     exit 1
 fi
 
-if [ "$(uname -m)" == "armv7l" ]; then
+if [[ "$(uname -m)" =~ armv7.? ]]; then
     # Update Mirrorlist
     cat > /etc/pacman.d/mirrorlist << EOF
 # Studio Connect Mirror
@@ -456,7 +456,7 @@ root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
-if [ "$(uname -m)" == "armv7l" ]; then
+if [[ "$(uname -m)" =~ armv7.? ]]; then
     # Only write fstab if no sdcard
     if [ ! "$(blkid /dev/mmcblk1p2)" ]; then
         uuid=$(blkid -o value -s UUID /dev/mmcblk0p2)
@@ -474,7 +474,7 @@ SystemMaxUse=20M
 EOF
 
 # Hostname
-if [ "$(uname -m)" == "armv7l" ]; then
+if [[ "$(uname -m)" =~ armv7.? ]]; then
     post=$(ip link show eth0 | grep ether | awk '{ print $2 }' | sed s/://g | cut -c 7-)
 else
     post="dev"
@@ -495,7 +495,7 @@ yes | pacman -Scc
 # Logrotate (mostly nginx logs)
 logrotate -f /etc/logrotate.conf
 
-if [ "$(uname -m)" == "armv7l" ]; then
+if [[ "$(uname -m)" =~ armv7.? ]]; then
     cd /tmp
     wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
     wget $pkg_url/libre/libre-0.4.9-1-armv7h.pkg.tar.xz
