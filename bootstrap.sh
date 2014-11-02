@@ -422,6 +422,11 @@ EOF
 
 chmod +x /opt/studio/bin/studio-update.sh
 
+cat > /etc/sysctl.d/99-sysctl.conf << EOF
+# realtime fix jackd
+kernel.sched_rt_runtime_us = -1
+EOF
+
 # DISABLED (baresip audio problems)
 #cat > /etc/modules-load.d/studio.conf << EOF
 #g_audio
