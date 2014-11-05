@@ -17,7 +17,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-connect/webapp.git"
 pkg_url="https://github.com/studio-connect/PKGBUILDs/raw/master"
-version="14.8.0-alpha"
+version="14.11.0-beta"
 checkout="master"
 update_docroot="/tmp/update"
 
@@ -140,9 +140,28 @@ After=redis.service
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/gunicorn -w 3 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
+ExecStart=/opt/studio/bin/gunicorn -w 2 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
 ExecStartPost=/usr/bin/redis-cli flushall
 CPUShares=200
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/studio-events.service << EOF
+[Unit]
+Description=studio-webapp events
+After=syslog.target
+After=network.target
+After=redis.service
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+ExecStart=/opt/studio/bin/python long_polling.py
+WorkingDirectory=/opt/studio/webapp
+CPUShares=100
 
 [Install]
 WantedBy=multi-user.target
@@ -207,6 +226,11 @@ http {
                 root /opt/studio/webapp/app/templates;
 
                 access_log off;
+
+		location /events {
+		    proxy_pass         http://127.0.0.1:1234;
+		    proxy_redirect     off;
+		}
 
                 location / { 
                     auth_basic "Please Login";
@@ -299,10 +323,11 @@ After=ntpdate.service
 Type=simple
 User=studio
 Group=studio
+LimitRTPRIO=infinity
 ExecStart=/usr/bin/baresip
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
-TimeoutStopSec=20
+TimeoutStopSec=10
 Restart=always
 RestartSec=5
 
@@ -349,6 +374,7 @@ module_tmp              account.so
 module_app              auloop.so
 module_app              contact.so
 module_app              menu.so
+module_app		redis.so
 ice_turn                yes
 ice_debug               yes
 ice_nomination          regular # {regular,aggressive}
@@ -422,6 +448,31 @@ EOF
 
 chmod +x /opt/studio/bin/studio-update.sh
 
+cat > /etc/systemd/system/studio-jackd.service << EOF
+[Unit]
+Description=Studio Link JACK DAEMON
+After=baresip
+After=studio-webapp
+
+[Service]
+LimitRTPRIO=infinity
+LimitMEMLOCK=infinity
+User=studio
+ExecStart=/opt/studio/bin/studio-jackd.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /opt/studio/bin/studio-jackd.sh << EOF
+#!/bin/bash
+device=\$(grep audio_player /opt/studio/.baresip/config | awk '{ print \$2 }' | awk -F: '{ print \$2 }')
+
+/usr/bin/jackd -R -P89 -dalsa -d hw:\$device -r48000 -p240 -n3
+EOF
+
+chmod +x /opt/studio/bin/studio-jackd.sh
+
 cat > /etc/sysctl.d/99-sysctl.conf << EOF
 # realtime fix jackd
 kernel.sched_rt_runtime_us = -1
@@ -432,7 +483,7 @@ EOF
 #g_audio
 #EOF
 #cat > /etc/modprobe.d/studio.conf << EOF
-#options g_audio iProduct=StudioConnect
+#options g_audio iProduct=StudioLink
 #EOF
 
 systemctl daemon-reload
@@ -443,9 +494,11 @@ systemctl enable avahi-daemon
 systemctl enable redis
 systemctl enable ntpdate
 systemctl enable studio-webapp
+systemctl enable studio-events
 systemctl enable studio-celery
 systemctl enable baresip
 systemctl enable fake-hwclock
+systemctl enable studio-jackd
 
 # Temporary disabling ip6tables until final version
 systemctl disable ip6tables.service
