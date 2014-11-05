@@ -72,8 +72,8 @@ update_status 50 # 50%
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-hwclock
 
-# Baresip requirements (codecs)
-$pacman -S spandsp gsm
+# Baresip/Jackd requirements (codecs)
+$pacman -S spandsp gsm celt
 
 # Create User and generate Virtualenv
 if [ ! -d $home ]; then
