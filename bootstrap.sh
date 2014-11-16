@@ -75,6 +75,9 @@ $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-h
 # Baresip/Jackd requirements (codecs)
 $pacman -S spandsp gsm celt
 
+# Long polling and baresip redis requirements
+$pacman -S hiredis libmicrohttpd
+
 # Create User and generate Virtualenv
 if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
@@ -111,6 +114,10 @@ fi
 if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
 fi
+
+# Compile long_polling server
+cd $home/webapp/long_polling
+make
 
 # One-time
 if [ "$(grep -E "^14\.5" /etc/studio-release)" ]; then
@@ -159,8 +166,7 @@ After=redis.service
 Type=simple
 User=studio
 Group=studio
-ExecStart=/opt/studio/bin/python long_polling.py
-WorkingDirectory=/opt/studio/webapp
+ExecStart=/opt/studio/webapp/long_polling/server
 CPUShares=100
 
 [Install]
@@ -228,7 +234,7 @@ http {
                 access_log off;
 
 		location /events {
-		    proxy_pass         http://127.0.0.1:1234;
+		    proxy_pass         http://127.0.0.1:8888;
 		    proxy_redirect     off;
 		}
 
@@ -459,6 +465,8 @@ LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
 User=studio
 ExecStart=/opt/studio/bin/studio-jackd.sh
+Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
@@ -556,9 +564,9 @@ logrotate -f /etc/logrotate.conf
 if [[ "$(uname -m)" =~ armv7.? ]]; then
     cd /tmp
     wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget $pkg_url/libre/libre-0.4.9-1-armv7h.pkg.tar.xz
+    wget $pkg_url/libre/libre-0.4.10-1-armv7h.pkg.tar.xz
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/baresip/baresip-14.8.0-1-armv7h.pkg.tar.xz
+    wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
     wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
