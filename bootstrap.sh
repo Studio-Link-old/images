@@ -29,7 +29,7 @@ update_status() {
 
 # Root permissions are required to run this script
 if [ "$(whoami)" != "root" ]; then
-    echo "Error: Studio Connect Bootstrap requires root privileges to install. Please re-run this script as root."
+    echo "Error: Studio Link Bootstrap requires root privileges to install. Please re-run this script as root."
     exit 1
 fi
 
@@ -598,6 +598,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
     wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
     wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
+    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
