@@ -71,6 +71,7 @@ update_status 50 # 50%
 # Install packages
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-hwclock
+$pacman -S python2-numpy
 
 # Baresip/Jackd requirements (codecs)
 $pacman -S spandsp gsm celt
@@ -517,12 +518,12 @@ EOF
 chown studio:studio /opt/studio/.asoundrc
 
 # DISABLED (baresip audio problems)
-#cat > /etc/modules-load.d/studio.conf << EOF
-#g_audio
-#EOF
-#cat > /etc/modprobe.d/studio.conf << EOF
-#options g_audio iProduct=StudioLink
-#EOF
+cat > /etc/modules-load.d/studio.conf << EOF
+g_audio
+EOF
+cat > /etc/modprobe.d/studio.conf << EOF
+options g_audio c_srate=48000 p_srate=48000
+EOF
 
 systemctl daemon-reload
 
@@ -598,7 +599,12 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
     wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
     wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
-    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
+
+    pacman -Q linux-am33x
+    if [ $? -eq 0 ]; then
+	    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
+    fi
+
     $pacman -U *-armv7h.pkg.tar.xz
     rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
