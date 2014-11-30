@@ -477,7 +477,7 @@ cat > /opt/studio/bin/studio-jackd.sh << EOF
 #!/bin/bash
 device=\$(grep audio_player /opt/studio/.baresip/config | awk '{ print \$2 }' | awk -F: '{ print \$2 }')
 
-/usr/bin/jackd -R -P89 -dalsa -d hw:\$device -r48000 -p240 -n3
+/usr/bin/jackd -R -P89 -dalsa -d hw:\$device -r48000 -p480 -n3
 EOF
 
 chmod +x /opt/studio/bin/studio-jackd.sh
