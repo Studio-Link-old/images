@@ -632,7 +632,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
     wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
 
-    pacman -Q linux-am33x
+    pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
 	    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
     fi
