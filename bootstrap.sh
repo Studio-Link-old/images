@@ -61,6 +61,9 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
+	cd /tmp
+	wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
+	$pacman -U jack2-14.8.0-1-armv7h.pkg.tar.xz
 fi
 
 # Upgrade packages
@@ -628,7 +631,6 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/libre/libre-0.4.10-1-armv7h.pkg.tar.xz
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
     wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
-    wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
 
     pacman -Q linux-am33x
     if [ $? -eq 0 ]; then
