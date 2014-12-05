@@ -493,10 +493,10 @@ Description=Studio Link g_audio_IN
 After=studio-jackd
 
 [Service]
+LimitRTPRIO=infinity
+LimitMEMLOCK=infinity
 User=studio
-ExecStart=alsa_in -d UAC2Gadget -c 2 -r 48000
-Restart=always
-RestartSec=5
+ExecStart=/usr/bin/alsa_in -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
 
 [Install]
 WantedBy=multi-user.target
@@ -508,10 +508,10 @@ Description=Studio Link g_audio_OUT
 After=studio-jackd
 
 [Service]
+LimitRTPRIO=infinity
+LimitMEMLOCK=infinity
 User=studio
-ExecStart=alsa_out -d UAC2Gadget -c 2 -r 48000
-Restart=always
-RestartSec=5
+ExecStart=/usr/bin/alsa_out -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
 
 [Install]
 WantedBy=multi-user.target
