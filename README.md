@@ -6,7 +6,7 @@
 
 http://archlinuxarm.org/platforms/armv7/ti/beaglebone-black
 
-### ODROID-U3
+### ODROID-U3 (without OTG audio support, need >=3.18 kernel)
 
 http://archlinuxarm.org/platforms/armv7/samsung/odroid-u3
 
