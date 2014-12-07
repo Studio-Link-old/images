@@ -630,7 +630,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
     wget $pkg_url/libre/libre-0.4.10-1-armv7h.pkg.tar.xz
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/baresip/baresip-14.11.0-1-armv7h.pkg.tar.xz
+    wget $pkg_url/baresip/baresip-14.11.0-2-armv7h.pkg.tar.xz
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
