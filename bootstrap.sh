@@ -34,7 +34,7 @@ if [ "$(whoami)" != "root" ]; then
 fi
 
 update_status 0 # 0%
-systemctl stop nginx
+systemctl stop nginx || true
 cd $update_docroot
 python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
@@ -61,9 +61,6 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 # Studio Connect Mirror
 Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
 EOF
-	cd /tmp
-	wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
-	$pacman -U jack2-14.8.0-1-armv7h.pkg.tar.xz
 fi
 
 # Upgrade packages
@@ -81,6 +78,12 @@ $pacman -S spandsp gsm celt
 
 # Long polling and baresip redis requirements
 $pacman -S hiredis libmicrohttpd
+
+if [[ "$(uname -m)" =~ armv7.? ]]; then
+	cd /tmp
+	wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
+	$pacman -U jack2-14.8.0-1-armv7h.pkg.tar.xz
+fi
 
 # Create User and generate Virtualenv
 if [ ! -d $home ]; then
@@ -634,6 +637,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
+	    $pacman -S linux-am33x
 	    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
     fi
 
