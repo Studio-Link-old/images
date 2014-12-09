@@ -40,6 +40,7 @@ python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
 
 # Cleanup pacman cache
+rm /var/lib/pacman/sync/*
 yes | pacman -Scc
 
 # Remove corrupt systemd journal files
