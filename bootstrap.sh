@@ -638,8 +638,8 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
-	    $pacman -R linux-am33x-legacy || true
 	    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
+	    yes | pacman -U linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
     fi
 
     $pacman -U *-armv7h.pkg.tar.xz
