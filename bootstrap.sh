@@ -147,9 +147,7 @@ update_status 90 # 90%
 cat > /etc/systemd/system/studio-webapp.service << EOF
 [Unit]
 Description=studio-webapp fastcgi
-After=syslog.target
-After=network.target
-After=redis.service
+After=syslog.target network.target redis.service
 
 [Service]
 Type=simple
@@ -166,9 +164,7 @@ EOF
 cat > /etc/systemd/system/studio-events.service << EOF
 [Unit]
 Description=studio-webapp events
-After=syslog.target
-After=network.target
-After=redis.service
+After=syslog.target network.target redis.service
 
 [Service]
 Type=simple
@@ -184,8 +180,7 @@ EOF
 cat > /etc/systemd/system/studio-celery.service << EOF
 [Unit]
 Description=studio-celery worker
-After=syslog.target
-After=network.target
+After=syslog.target network.target
 
 [Service]
 Type=simple
@@ -202,8 +197,7 @@ EOF
 cat > /etc/systemd/system/aiccu.service << EOF
 [Unit]
 Description=SixXS Automatic IPv6 Connectivity Configuration Utility
-After=network.target
-After=ntpdate.service
+After=network.target ntpdate.service
 
 [Service]
 Type=forking
@@ -329,9 +323,7 @@ EOF
 cat > /etc/systemd/system/baresip.service << EOF
 [Unit]
 Description=baresip
-After=syslog.target
-After=network.target
-After=ntpdate.service
+After=syslog.target network.target ntpdate.service
 
 [Service]
 Type=simple
@@ -439,8 +431,7 @@ chmod +x /etc/netctl/hooks/dhcpcd-timeout
 cat > /etc/systemd/system/studio-update.service << EOF
 [Unit]
 Description=studio-update
-After=syslog.target
-After=network.target
+After=syslog.target network.target
 
 [Service]
 Type=oneshot
@@ -465,8 +456,7 @@ chmod +x /opt/studio/bin/studio-update.sh
 cat > /etc/systemd/system/studio-jackd.service << EOF
 [Unit]
 Description=Studio Link JACK DAEMON
-After=baresip
-After=studio-webapp
+After=baresip studio-webapp
 
 [Service]
 LimitRTPRIO=infinity
@@ -665,6 +655,8 @@ fi
 systemctl start redis
 systemctl start studio-celery
 systemctl start studio-webapp
+systemctl start studio-events
+systemctl start studio-jackd
 systemctl start baresip
 
 if [ ! -f /etc/studio-link-community ]; then
@@ -684,7 +676,7 @@ echo "Syncing filesystem..."
 sync; sleep 5; sync
 
 kill $http_pid
-sleep 2 
+sleep 5
 systemctl start nginx
 
 # Update Version
