@@ -1,5 +1,7 @@
 # Studio Link
 
+[![Build Status](https://ci-studio.visr.de/job/studio-link-images/badge/icon)](https://ci-studio.visr.de/job/studio-link-images/)
+
 ## Current Base Images
 
 ### BeagleBone Black
