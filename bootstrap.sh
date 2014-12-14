@@ -40,8 +40,8 @@ python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
 
 # Cleanup pacman cache
-rm /var/lib/pacman/sync/*
 yes | pacman -Scc
+rm /var/lib/pacman/sync/*
 
 # Remove corrupt systemd journal files
 find /var/log/journal -name "*.journal~" -exec rm {} \;
@@ -628,8 +628,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
-	    wget $pkg_url/linux-am33x/linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
-	    yes | pacman -U linux-am33x-3.18.0-1-armv7h.pkg.tar.xz
+	    yes | pacman -S linux-am33x
     fi
 
     $pacman -U *-armv7h.pkg.tar.xz
