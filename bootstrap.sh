@@ -91,7 +91,7 @@ if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
     virtualenv2 --system-site-packages $home
     git clone $repo $home/webapp
-    $home/bin/pip install pytz==2014.4
+    $home/bin/pip install pytz==2014.10
     $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
@@ -130,7 +130,7 @@ make
 # One-time
 if [ "$(grep -E "^14\.5" /etc/studio-release)" ]; then
 	cd $home/webapp
-	$home/bin/pip install --upgrade pytz==2014.4
+	$home/bin/pip install --upgrade pytz==2014.10
 	$home/bin/pip install --upgrade -r $home/webapp/requirements.txt
 	sync
 fi
