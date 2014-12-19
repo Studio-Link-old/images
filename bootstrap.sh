@@ -624,13 +624,16 @@ root ALL=(ALL) ALL
 studio ALL=(ALL) NOPASSWD: ALL
 EOF
 
-if [[ "$(uname -m)" =~ armv7.? ]]; then
+pacman -Q | grep linux-am33x
+if [ $? -eq 0 ]; then
+    mkdir -p /media
     # Only write fstab if no sdcard
     if [ ! "$(blkid /dev/mmcblk1p2)" ]; then
         uuid=$(blkid -o value -s UUID /dev/mmcblk0p2)
         # Mount Options (noatime)
         cat > /etc/fstab << EOF
 UUID=$uuid / ext4 defaults,noatime,nodiratime 0 1
+/dev/disk/by-path/platform-48060000.mmc-part1 /media auto defaults,x-systemd.automount 0 0
 EOF
     fi
 fi
