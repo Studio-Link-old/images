@@ -240,6 +240,10 @@ http {
 		    proxy_redirect     off;
 		}
 
+		location /media {
+         	    root /;
+		}
+
                 location / { 
                     auth_basic "Please Login";
                     auth_basic_user_file  /opt/studio/webapp/htpasswd;
