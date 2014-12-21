@@ -335,7 +335,7 @@ User=studio
 Group=studio
 LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
-ExecStart=/usr/bin/baresip
+ExecStart=/usr/bin/baresip -d
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
 TimeoutStopSec=10
@@ -564,18 +564,22 @@ cat > /opt/studio/routing.xml << EOF
     <port name="capture_1">
       <connection port="sip-src:in0" />
       <connection port="sip-src:in1" />
+      <connection port="jack_capture:input1" />
     </port>
     <port name="capture_2">
       <connection port="sip-src:in0" />
       <connection port="sip-src:in1" />
+      <connection port="jack_capture:input1" />
     </port>
   </client>
   <client name="sip-play">
     <port name="out0">
       <connection port="system:playback_2" />
+      <connection port="jack_capture:input2" />
     </port>
     <port name="out1">
       <connection port="system:playback_1" />
+      <connection port="jack_capture:input2" />
     </port>
   </client>
 </jack>
@@ -594,6 +598,23 @@ User=studio
 Group=studio
 LimitMEMLOCK=infinity
 ExecStart=/usr/bin/aj-snapshot -j -d /opt/studio/routing.xml
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /etc/systemd/system/studio-capture.service << EOF
+[Unit]
+Description=studio-capture
+After=syslog.target network.target studio-jackd
+
+[Service]
+Type=oneshot
+User=studio
+Group=studio
+LimitMEMLOCK=infinity
+ExecStart=/usr/bin/jack_capture --daemon -c 2 -f flac -dm -mc -B 8 -Rf 659760000
+WorkingDirectory=/media
 
 [Install]
 WantedBy=multi-user.target
@@ -678,6 +699,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
     wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
     wget $pkg_url/baresip/baresip-14.11.0-3-armv7h.pkg.tar.xz
     wget $pkg_url/aj-snapshot/aj-snapshot-0.9.6-1-armv7h.pkg.tar.xz
+    wget $pkg_url/jack_capture/jack_capture-0.9.71-1-armv7h.pkg.tar.xz
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
