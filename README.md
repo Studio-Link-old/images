@@ -16,23 +16,9 @@ http://archlinuxarm.org/platforms/armv7/samsung/odroid-u3
 
 If you have a clean archlinux image you can run one of the following commands:
 
-### Install/Update stable
-
-```
-touch /etc/studio-link-community
-curl -L https://raw.githubusercontent.com/studio-link/images/14.5.0-alpha/bootstrap.sh | bash
-```
-
-### Install/Update development
+### Install/Update
 
 ```
 touch /etc/studio-link-community
 curl -L https://raw.githubusercontent.com/studio-link/images/master/bootstrap.sh | bash
-```
-
-### Install/Update a specific branche
-
-```
-touch /etc/studio-link-community
-curl -L https://raw.githubusercontent.com/studio-link/images/feature_branch/bootstrap.sh | bash
 ```
