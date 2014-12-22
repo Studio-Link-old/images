@@ -35,6 +35,7 @@ fi
 
 update_status 0 # 0%
 systemctl stop nginx || true
+sleep 2
 cd $update_docroot
 python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
@@ -335,7 +336,7 @@ User=studio
 Group=studio
 LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
-ExecStart=/usr/bin/baresip -d
+ExecStart=/usr/bin/baresip
 WorkingDirectory=/opt/studio/webapp
 CPUShares=2048
 TimeoutStopSec=10
