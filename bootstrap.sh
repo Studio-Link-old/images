@@ -607,19 +607,56 @@ EOF
 cat > /etc/systemd/system/studio-capture.service << EOF
 [Unit]
 Description=studio-capture
-After=syslog.target network.target studio-jackd
+After=syslog.target network.target
 
 [Service]
-Type=oneshot
+Type=simple
 User=studio
 Group=studio
+LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
-ExecStart=/usr/bin/jack_capture --daemon -c 2 -f flac -dm -mc -B 8 -Rf 659760000
+ExecStart=/opt/studio/bin/studio-capture.sh
 WorkingDirectory=/media
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
+cat > /opt/studio/bin/studio-capture.sh << EOF
+#!/bin/bash
+hostname=\$(hostname)
+date=\$(date +%d%m%y%H%M%S)
+/usr/bin/jack_capture --daemon -b 16 -c 2 -f flac -dm -mc -B 8 -Rf 659760000 \$hostname-\$date
+EOF
+
+chmod +x /opt/studio/bin/studio-capture.sh
+
+cat > /etc/systemd/system/studio-playback.service << EOF
+[Unit]
+Description=studio-playback
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=studio
+Group=studio
+LimitRTPRIO=infinity
+LimitMEMLOCK=infinity
+ExecStart=/opt/studio/bin/studio-playback.sh
+WorkingDirectory=/media
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat > /opt/studio/bin/studio-playback.sh << EOF
+#!/bin/bash
+filename=\$(redis-cli get playback)
+/usr/bin/flac -d \$filename -c | aplay
+redis-cli set playback empty
+EOF
+
+chmod +x /opt/studio/bin/studio-playback.sh
 
 systemctl daemon-reload
 
