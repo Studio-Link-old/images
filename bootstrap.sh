@@ -5,7 +5,7 @@
 # |  \__ \/ __/ / / / __  / / __ \   / /   / / __ \/ //_/                    |
 # | ___/ / /_/ /_/ / /_/ / / /_/ /  / /___/ / / / / ,<                       |
 # |/____/\__/\__,_/\__,_/_/\____/  /_____/_/_/ /_/_/|_|                      |
-# |Copyright Sebastian Reimers 2013 - 2014 studio-link.de                    |
+# |Copyright Sebastian Reimers 2013 - 2015 studio-link.de                    |
 # |License: BSD-2-Clause (see LICENSE File)                                  |
 # +--------------------------------------------------------------------------+
 
@@ -616,6 +616,7 @@ Group=studio
 LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
 ExecStart=/opt/studio/bin/studio-capture.sh
+ExecStop=/usr/bin/killall jack_capture
 WorkingDirectory=/media
 
 [Install]
