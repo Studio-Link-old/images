@@ -349,51 +349,6 @@ EOF
 
 mkdir -p $home/.baresip
 
-cat > $home/.baresip/config << EOF
-poll_method             epoll
-input_device            /dev/event0
-input_port              5555
-sip_trans_bsize         128
-sip_listen              0.0.0.0:5060
-audio_player            alsa,plughw:0,0
-audio_source            alsa,plughw:0,0
-audio_alert             alsa,plughw:0,0
-audio_srate             8000-48000
-ausrc_srate             48000
-auplay_srate            48000
-audio_channels          1-2
-rtp_tos                 184
-rtcp_enable             yes
-rtcp_mux                no
-jitter_buffer_delay     1-5
-rtp_stats               no
-module_path             /usr/lib/baresip/modules
-module                  httpdsc.so
-# Audio codec Modules (in order) {
-module                  opus.so
-module                  g722.so
-module                  g726.so
-module                  g711.so
-module                  gsm.so
-module                  l16.so
-# }
-module                  alsa.so
-module                  stun.so
-module                  turn.so
-module                  ice.so
-module_tmp              uuid.so
-module_tmp              account.so
-module_app              auloop.so
-module_app              contact.so
-module_app              menu.so
-module_app		redis.so
-ice_turn                yes
-ice_debug               yes
-ice_nomination          regular # {regular,aggressive}
-ice_mode                full    # {full,lite}
-opus_bitrate            64000
-EOF
-
 chown -R studio:studio $home/.baresip
 
 # Fix IPv6 avahi
