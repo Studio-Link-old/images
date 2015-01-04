@@ -582,7 +582,7 @@ cat > /opt/studio/bin/studio-capture.sh << EOF
 #!/bin/bash
 hostname=\$(hostname)
 date=\$(date +%d%m%y%H%M%S)
-/usr/bin/jack_capture --daemon -b 16 -c 2 -f flac -dm -mc -B 8 -Rf 659760000 \$hostname-\$date
+/usr/bin/jack_capture --daemon -b 16 -c 2 -f flac -dm -mc -B 8 -Rf 864000000 \$hostname-\$date
 EOF
 
 chmod +x /opt/studio/bin/studio-capture.sh
