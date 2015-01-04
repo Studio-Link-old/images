@@ -14,7 +14,7 @@ http://archlinuxarm.org/platforms/armv7/samsung/odroid-u3
 
 ## Bootstrap
 
-If you have a clean archlinux image you can run one of the following commands:
+If you have a clean archlinux image you can run the following commands:
 
 ### Install/Update
 
