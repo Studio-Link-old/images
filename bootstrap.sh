@@ -445,36 +445,6 @@ cat > /etc/sysctl.d/99-sysctl.conf << EOF
 kernel.sched_rt_runtime_us = -1
 EOF
 
-cat > /etc/systemd/system/studio-gaudio_in.service << EOF
-[Unit]
-Description=Studio Link g_audio_IN
-After=studio-jackd
-
-[Service]
-LimitRTPRIO=infinity
-LimitMEMLOCK=infinity
-User=studio
-ExecStart=/usr/bin/alsa_in -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat > /etc/systemd/system/studio-gaudio_out.service << EOF
-[Unit]
-Description=Studio Link g_audio_OUT
-After=studio-jackd
-
-[Service]
-LimitRTPRIO=infinity
-LimitMEMLOCK=infinity
-User=studio
-ExecStart=/usr/bin/alsa_out -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 cat > /opt/studio/.asoundrc << EOF
 # convert alsa API over jack API
 
