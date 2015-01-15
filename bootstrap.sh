@@ -70,6 +70,7 @@ fi
 
 # Upgrade packages
 $pacman -Syu
+pacman-db-upgrade
 
 update_status 50 # 50%
 
