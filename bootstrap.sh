@@ -40,6 +40,9 @@ cd $update_docroot
 python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
 
+# New pacman Version
+pacman-db-upgrade
+
 # Cleanup pacman cache
 yes | pacman -Scc
 rm /var/lib/pacman/sync/*
