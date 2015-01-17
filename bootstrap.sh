@@ -671,7 +671,7 @@ if [[ "$(uname -m)" =~ armv7.? ]]; then
 
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
-	    yes | pacman -S linux-am33x
+	    yes | pacman --needed -S linux-am33x
     fi
 
     $pacman -U *-armv7h.pkg.tar.xz
