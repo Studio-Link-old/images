@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 qemu="/opt/qemu-2.2.0/arm-softmmu/qemu-system-arm"
 branch=$(echo "${GIT_BRANCH}" | cut -d'/' -f 2-)
 export QEMU_AUDIO_DRV=none
