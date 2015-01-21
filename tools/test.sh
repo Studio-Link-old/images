@@ -1,6 +1,6 @@
 #!/bin/bash
 qemu="/opt/qemu-2.2.0/arm-softmmu/qemu-system-arm"
-branch=$(git branch | sed -n '/\* /s///p')
+branch=$(echo ${GIT_BRANCH} | sed -n '/\* /s///p')
 export QEMU_AUDIO_DRV=none
 $qemu -daemonize -M vexpress-a9 -kernel zImage \
 	-drive file=root.img,if=sd,cache=none -append "root=/dev/mmcblk0p2 rw" \
