@@ -660,6 +660,7 @@ fi
 
 # Starting Services
 systemctl start redis
+sleep 2 # workaround - redis needs sometimes more time.
 systemctl start studio-celery
 systemctl start studio-webapp
 systemctl start studio-events
