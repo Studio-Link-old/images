@@ -18,12 +18,11 @@ home="/opt/studio"
 repo="https://github.com/studio-link/webapp.git"
 pkg_url="https://github.com/studio-link/PKGBUILDs/raw/master"
 version="15.1.0-beta"
-checkout="master"
 update_docroot="/tmp/update"
 
 update_status() {
     mkdir -p $update_docroot
-    curl -L https://raw.githubusercontent.com/studio-link/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
+    curl -L https://raw.githubusercontent.com/studio-link/images/master/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
     mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
 
@@ -63,8 +62,19 @@ fi
 if [[ "$(uname -m)" =~ armv7.? ]]; then
     # Update Mirrorlist
     cat > /etc/pacman.d/mirrorlist << EOF
-# Studio Connect Mirror
-Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
+# Studio Link Repo
+Server = http://repo.studio-link.de/$version/armv7h/\$repo
+EOF
+
+    cat > /etc/pacman.conf << EOF
+[options]
+HoldPkg     = pacman glibc
+Architecture = armv7h
+CheckSpace
+SigLevel = Never
+
+[studio]
+Include = /etc/pacman.d/mirrorlist
 EOF
 fi
 
@@ -85,19 +95,13 @@ $pacman -S spandsp gsm celt
 # Long polling and baresip redis requirements
 $pacman -S hiredis libmicrohttpd
 
-if [[ "$(uname -m)" =~ armv7.? ]]; then
-	cd /tmp
-	wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
-	$pacman -U jack2-14.8.0-1-armv7h.pkg.tar.xz
-fi
+# Studio PKGBUILDs
+$pacman -S jack2 opus libre librem baresip aj-snapshot jack_capture
 
 # Create User and generate Virtualenv
 if [ ! -d $home ]; then
     useradd --create-home --password paCam17s4xpyc --home-dir $home studio
-    virtualenv2 --system-site-packages $home
-    git clone $repo $home/webapp
-    $home/bin/pip install pytz==2014.10
-    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+    $pacman -S studio-webapp
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
 else
@@ -106,38 +110,10 @@ else
         systemctl stop studio-celery
         systemctl stop baresip
     fi
-    
-    # Upgrade Virtualenv
-    python2_org_md5=$(md5sum /usr/bin/python2.7 | awk '{ print $1 }')
-    python2_env_md5=$(md5sum $home/bin/python2 | awk '{ print $1 }')
-    if [ "$python2_org_md5" != "$python2_env_md5" ]; then
-        virtualenv2 --system-site-packages $home
-    fi
-
-    cd $home/webapp
-    git checkout master
-    git pull
-    git checkout -f $checkout
-    if [ "$checkout" == "devel" ]; then
-        git pull
-    fi
-    $home/bin/pip install -r $home/webapp/requirements.txt
 fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
-fi
-
-# Compile long_polling server
-cd $home/webapp/long_polling
-make
-
-# One-time
-if [ "$(grep -E "^14\.5" /etc/studio-release)" ]; then
-	cd $home/webapp
-	$home/bin/pip install --upgrade pytz==2014.10
-	$home/bin/pip install --upgrade -r $home/webapp/requirements.txt
-	sync
 fi
 
 chown -R studio:studio $home
@@ -661,21 +637,10 @@ yes | pacman -Scc
 logrotate -f /etc/logrotate.conf
 
 if [[ "$(uname -m)" =~ armv7.? ]]; then
-    cd /tmp
-    wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget $pkg_url/libre/libre-0.4.11-1-armv7h.pkg.tar.xz
-    wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/baresip/baresip-15.1.0-1-armv7h.pkg.tar.xz
-    wget $pkg_url/aj-snapshot/aj-snapshot-0.9.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/jack_capture/jack_capture-14.12.0-1-armv7h.pkg.tar.xz
-
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
 	    yes | pacman --needed -S linux-am33x
     fi
-
-    $pacman -U *-armv7h.pkg.tar.xz
-    rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
 
 # Add Audio files
