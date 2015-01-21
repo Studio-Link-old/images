@@ -100,7 +100,7 @@ $pacman -S jack2 opus libre librem baresip aj-snapshot jack_capture
 
 # Create User and generate Virtualenv
 if [ ! -d $home ]; then
-    useradd --create-home --password paCam17s4xpyc --home-dir $home studio
+    useradd --password paCam17s4xpyc --home-dir $home studio
     $pacman -S studio-webapp
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
@@ -117,7 +117,6 @@ if [ ! -f $home/webapp/htpasswd ]; then
 fi
 
 chown -R studio:studio $home
-chmod 755 $home
 gpasswd -a studio audio
 gpasswd -a studio video
 mkdir -p $home/logs
