@@ -98,7 +98,7 @@ $pacman -S hiredis libmicrohttpd
 # Studio PKGBUILDs
 $pacman -S jack2 opus libre librem baresip aj-snapshot jack_capture
 
-# Create User and generate Virtualenv
+# Create User
 if [ ! -d $home ]; then
     useradd --password paCam17s4xpyc --home-dir $home studio
     $pacman -S studio-webapp
@@ -109,6 +109,16 @@ else
         systemctl stop studio-webapp
         systemctl stop studio-celery
         systemctl stop baresip
+    fi
+    # Check if migration to studio-webapp package already completed
+    pacman -Q studio-webapp
+    if [ $? -ne 0 ]; then
+        cp -a /opt/studio/webapp/app.db /tmp/
+        cp -a /opt/studio/webapp/htpasswd /tmp/
+        rm -Rf /opt/studio
+        $pacman -S studio-webapp
+        cp -a /tmp/app.db /opt/studio/webapp/
+        cp -a /tmp/htpasswd /opt/studio/webapp/
     fi
 fi
 
