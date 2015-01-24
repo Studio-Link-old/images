@@ -573,6 +573,34 @@ EOF
 
 chmod +x /opt/studio/bin/studio-playback.sh
 
+if [ ! -f /etc/studio-link-community ]; then
+    cat > /opt/studio/bin/studio-vpn-update.sh << EOF
+#!/bin/bash
+
+hostname=\$(ip link show eth0 | grep ether | awk '{ print \$2 }' | sed s/://g | cut -c 7-)
+private_ip=\$(hostname -i)
+
+curl --data "hostname=\$hostname&private_ip=\$private_ip" https://vpn.studio-link.de/update.php
+EOF
+    chmod +x /opt/studio/bin/studio-vpn-update.sh
+
+    cat > /etc/systemd/system/studio-vpn-update.service << EOF
+[Unit]
+Description=studio-vpn-update
+After=syslog.target network.target baresip
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/opt/studio/bin/studio-vpn-update.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+fi
+
 systemctl daemon-reload
 
 # Enable systemd start scripts
@@ -588,6 +616,9 @@ systemctl enable fake-hwclock
 systemctl enable studio-jackd
 systemctl enable aj-snapshot
 systemctl enable lldpd
+if [ ! -f /etc/studio-link-community ]; then
+    systemctl enable studio-vpn-update
+fi
 
 # Temporary disabling ip6tables until final version
 systemctl disable ip6tables.service
