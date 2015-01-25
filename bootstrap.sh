@@ -87,7 +87,7 @@ update_status 50 # 50%
 # Install packages
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-hwclock
-$pacman -S python2-numpy ngrep tcpdump lldpd
+$pacman -S python2-numpy ngrep tcpdump lldpd dosfstools
 
 # Baresip/Jackd requirements (codecs)
 $pacman -S spandsp gsm celt
@@ -642,7 +642,7 @@ if [ $? -eq 0 ]; then
         # Mount Options (noatime)
         cat > /etc/fstab << EOF
 UUID=$uuid / ext4 defaults,noatime,nodiratime 0 1
-/dev/disk/by-path/platform-48060000.mmc-part1 /media auto defaults,x-systemd.automount 0 0
+/dev/disk/by-path/platform-48060000.mmc-part1 /media auto defaults,uid=1000,x-systemd.automount 0 0
 EOF
     fi
 fi
