@@ -586,7 +586,7 @@ EOF
     cat > /etc/systemd/system/studio-vpn-update.service << EOF
 [Unit]
 Description=studio-vpn-update
-After=syslog.target network.target baresip
+After=syslog.target network.target ntpdate.service
 
 [Service]
 Type=oneshot
