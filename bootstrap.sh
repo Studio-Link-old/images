@@ -111,8 +111,7 @@ else
         systemctl stop baresip
     fi
     # Check if migration to studio-webapp package already completed
-    pacman -Q studio-webapp
-    if [ $? -ne 0 ]; then
+    if [ "$(pacman -Q studio-webapp)" == "" ]; then
         cp -a /opt/studio/webapp/app.db /tmp/
         cp -a /opt/studio/webapp/htpasswd /tmp/
         rm -Rf /opt/studio
