@@ -44,7 +44,7 @@ pacman-db-upgrade
 
 # Cleanup pacman cache
 yes | pacman -Scc
-rm /var/lib/pacman/sync/*.db
+rm /var/lib/pacman/sync/*.db || true
 
 # Remove corrupt systemd journal files
 find /var/log/journal -name "*.journal~" -exec rm {} \;
