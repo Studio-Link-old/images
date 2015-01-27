@@ -405,7 +405,7 @@ chmod +x /opt/studio/bin/studio-update.sh
 cat > /etc/systemd/system/studio-jackd.service << EOF
 [Unit]
 Description=Studio Link JACK DAEMON
-After=baresip studio-webapp
+After=baresip.service studio-webapp.service
 
 [Service]
 LimitRTPRIO=infinity
@@ -504,7 +504,7 @@ chown studio:studio /opt/studio/routing.xml
 cat > /etc/systemd/system/aj-snapshot.service << EOF
 [Unit]
 Description=aj-snapshot
-After=syslog.target network.target studio-jackd
+After=syslog.target network.target studio-jackd.service
 
 [Service]
 Type=simple
