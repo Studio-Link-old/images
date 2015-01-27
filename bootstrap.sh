@@ -395,7 +395,7 @@ cat > /opt/studio/bin/studio-update.sh << EOF
 #!/bin/bash
 version=\$(/usr/bin/redis-cli get next_release)
 if [ \$version ]; then
-    curl -L https://raw.githubusercontent.com/studio-link/images/\$version/bootstrap.sh | bash
+    curl -L https://raw.githubusercontent.com/studio-link/images/\$version/bootstrap.sh | bash -ex
 fi
 EOF
 
