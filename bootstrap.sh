@@ -48,7 +48,6 @@ rm /var/lib/pacman/sync/*.db || true
 
 # Remove corrupt systemd journal files
 find /var/log/journal -name "*.journal~" -exec rm {} \;
-systemctl restart systemd-journald
 
 update_status 10 # 10%
 
