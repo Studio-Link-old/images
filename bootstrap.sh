@@ -27,7 +27,7 @@ update_status() {
 #!/bin/bash
 echo "Content-type: text/html"
 echo ""
-sudo journalctl -u studio-update.service
+sudo journalctl | grep studio-update
 EOF
     chmod +x $update_docroot/cgi-bin/logging.sh
     curl -L https://raw.githubusercontent.com/studio-link/images/devel/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
@@ -84,6 +84,9 @@ SigLevel = Never
 Include = /etc/pacman.d/mirrorlist
 EOF
 fi
+
+# Remove man-db (rebuild takes too much cpu load and time)
+$pacman -R man-db man-pages || true
 
 # Upgrade packages
 $pacman -Syu
