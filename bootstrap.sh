@@ -21,12 +21,13 @@ version="15.1.0-beta"
 update_docroot="/tmp/update"
 
 update_status() {
+    echo "nobody ALL=(ALL) NOPASSWD: /usr/bin/journalctl" >> /etc/sudoers
     mkdir -p $update_docroot/cgi-bin
     cat > $update_docroot/cgi-bin/logging.sh << EOF
-    #!/bin/bash
-    echo "Content-type: text/html"
-    echo ""
-    journalctl -u studio-update.service
+#!/bin/bash
+echo "Content-type: text/html"
+echo ""
+sudo journalctl -u studio-update.service
 EOF
     chmod +x $update_docroot/cgi-bin/logging.sh
     curl -L https://raw.githubusercontent.com/studio-link/images/devel/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
