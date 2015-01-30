@@ -86,7 +86,7 @@ EOF
 fi
 
 # Remove man-db (rebuild takes too much cpu load and time)
-$pacman -R man-db man-pages || true
+pacman --noconfirm -R man-db man-pages || true
 
 # Upgrade packages
 $pacman -Syu
