@@ -21,7 +21,14 @@ version="15.1.0-beta"
 update_docroot="/tmp/update"
 
 update_status() {
-    mkdir -p $update_docroot
+    mkdir -p $update_docroot/cgi-bin
+    cat > $update_docroot/cgi-bin/logging.sh << EOF
+    #!/bin/bash
+    echo "Content-type: text/html"
+    echo ""
+    journalctl -u studio-update.service
+EOF
+    chmod +x $update_docroot/cgi-bin/logging.sh
     curl -L https://raw.githubusercontent.com/studio-link/images/master/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
     mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
@@ -36,7 +43,7 @@ update_status 0 # 0%
 systemctl stop nginx || true
 sleep 2
 cd $update_docroot
-python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
+python2 -m CGIHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
 
 # New pacman Version
