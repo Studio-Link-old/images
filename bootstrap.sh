@@ -30,7 +30,7 @@ echo ""
 sudo journalctl | grep studio-update
 EOF
     chmod +x $update_docroot/cgi-bin/logging.sh
-    curl -L https://raw.githubusercontent.com/studio-link/images/devel/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
+    curl -L https://raw.githubusercontent.com/studio-link/images/master/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
     mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
 
