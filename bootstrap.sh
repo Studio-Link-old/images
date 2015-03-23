@@ -153,7 +153,7 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/bin/gunicorn -w 2 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
-ExecStartPost=/usr/bin/redis-cli flushall
+-ExecStartPost=/usr/bin/redis-cli flushall
 CPUShares=200
 
 [Install]
@@ -709,7 +709,6 @@ fi
 
 # Starting Services
 systemctl start redis
-sleep 2 # workaround - redis needs sometimes more time.
 systemctl start studio-celery
 systemctl start studio-webapp
 systemctl start studio-events
