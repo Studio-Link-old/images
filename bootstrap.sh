@@ -17,13 +17,20 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-link/webapp.git"
 pkg_url="https://github.com/studio-link/PKGBUILDs/raw/master"
-version="14.12.0-beta"
-checkout="master"
+version="15.1.0-beta"
 update_docroot="/tmp/update"
 
 update_status() {
-    mkdir -p $update_docroot
-    curl -L https://raw.githubusercontent.com/studio-link/images/$checkout/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
+    echo "nobody ALL=(ALL) NOPASSWD: /usr/bin/journalctl" >> /etc/sudoers
+    mkdir -p $update_docroot/cgi-bin
+    cat > $update_docroot/cgi-bin/logging.sh << EOF
+#!/bin/bash
+echo "Content-type: text/html"
+echo ""
+sudo journalctl | grep studio-update
+EOF
+    chmod +x $update_docroot/cgi-bin/logging.sh
+    curl -L https://raw.githubusercontent.com/studio-link/images/master/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
     mv $update_docroot/index.html_tmp $update_docroot/index.html
 }
 
@@ -37,16 +44,18 @@ update_status 0 # 0%
 systemctl stop nginx || true
 sleep 2
 cd $update_docroot
-python2 -m SimpleHTTPServer 80 > /dev/null 2>&1 &
+python2 -m CGIHTTPServer 80 > /dev/null 2>&1 &
 http_pid=$!
+
+# New pacman Version
+pacman-db-upgrade
 
 # Cleanup pacman cache
 yes | pacman -Scc
-rm /var/lib/pacman/sync/*
+rm /var/lib/pacman/sync/*.db || true
 
 # Remove corrupt systemd journal files
 find /var/log/journal -name "*.journal~" -exec rm {} \;
-systemctl restart systemd-journald
 
 update_status 10 # 10%
 
@@ -60,20 +69,35 @@ fi
 if [[ "$(uname -m)" =~ armv7.? ]]; then
     # Update Mirrorlist
     cat > /etc/pacman.d/mirrorlist << EOF
-# Studio Connect Mirror
-Server = http://mirror.studio-connect.de/$version/armv7h/\$repo
+# Studio Link Repo
+Server = http://repo.studio-link.de/$version/armv7h/\$repo
+EOF
+
+    cat > /etc/pacman.conf << EOF
+[options]
+HoldPkg     = pacman glibc
+Architecture = armv7h
+CheckSpace
+SigLevel = Never
+
+[studio]
+Include = /etc/pacman.d/mirrorlist
 EOF
 fi
 
+# Remove man-db (rebuild takes too much cpu load and time)
+pacman --noconfirm -R man-db man-pages || true
+
 # Upgrade packages
 $pacman -Syu
+pacman-db-upgrade
 
 update_status 50 # 50%
 
 # Install packages
 $pacman -S git vim ntp nginx aiccu python2 python2-distribute avahi wget
 $pacman -S python2-virtualenv alsa-plugins alsa-utils gcc make redis sudo fake-hwclock
-$pacman -S python2-numpy ngrep tcpdump lldpd
+$pacman -S python2-numpy ngrep tcpdump lldpd dosfstools
 
 # Baresip/Jackd requirements (codecs)
 $pacman -S spandsp gsm celt
@@ -81,19 +105,13 @@ $pacman -S spandsp gsm celt
 # Long polling and baresip redis requirements
 $pacman -S hiredis libmicrohttpd
 
-if [[ "$(uname -m)" =~ armv7.? ]]; then
-	cd /tmp
-	wget $pkg_url/jack2/jack2-14.8.0-1-armv7h.pkg.tar.xz
-	$pacman -U jack2-14.8.0-1-armv7h.pkg.tar.xz
-fi
+# Studio PKGBUILDs
+$pacman -S jack2 opus libre librem baresip aj-snapshot jack_capture
 
-# Create User and generate Virtualenv
+# Create User
 if [ ! -d $home ]; then
-    useradd --create-home --password paCam17s4xpyc --home-dir $home studio
-    virtualenv2 --system-site-packages $home
-    git clone $repo $home/webapp
-    $home/bin/pip install pytz==2014.10
-    $home/bin/pip install --upgrade -r $home/webapp/requirements.txt
+    useradd --password paCam17s4xpyc --home-dir $home studio
+    $pacman -S studio-webapp
     cd $home/webapp
     $home/bin/python -c "from app import db; db.create_all();"
 else
@@ -102,42 +120,22 @@ else
         systemctl stop studio-celery
         systemctl stop baresip
     fi
-    
-    # Upgrade Virtualenv
-    python2_org_md5=$(md5sum /usr/bin/python2.7 | awk '{ print $1 }')
-    python2_env_md5=$(md5sum $home/bin/python2 | awk '{ print $1 }')
-    if [ "$python2_org_md5" != "$python2_env_md5" ]; then
-        virtualenv2 --system-site-packages $home
+    # Check if migration to studio-webapp package already completed
+    if [ "$(pacman -Q studio-webapp)" == "" ]; then
+        cp -a /opt/studio/webapp/app.db /tmp/
+        cp -a /opt/studio/webapp/htpasswd /tmp/
+        rm -Rf /opt/studio
+        $pacman -S studio-webapp
+        cp -a /tmp/app.db /opt/studio/webapp/
+        cp -a /tmp/htpasswd /opt/studio/webapp/
     fi
-
-    cd $home/webapp
-    git checkout master
-    git pull
-    git checkout -f $checkout
-    if [ "$checkout" == "devel" ]; then
-        git pull
-    fi
-    $home/bin/pip install -r $home/webapp/requirements.txt
 fi
 
 if [ ! -f $home/webapp/htpasswd ]; then
     echo 'studio:$apr1$Qq44Nzw6$pRmaAHIi001i4UChgU1jF1' > $home/webapp/htpasswd
 fi
 
-# Compile long_polling server
-cd $home/webapp/long_polling
-make
-
-# One-time
-if [ "$(grep -E "^14\.5" /etc/studio-release)" ]; then
-	cd $home/webapp
-	$home/bin/pip install --upgrade pytz==2014.10
-	$home/bin/pip install --upgrade -r $home/webapp/requirements.txt
-	sync
-fi
-
 chown -R studio:studio $home
-chmod 755 $home
 gpasswd -a studio audio
 gpasswd -a studio video
 mkdir -p $home/logs
@@ -155,7 +153,7 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/bin/gunicorn -w 2 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
-ExecStartPost=/usr/bin/redis-cli flushall
+-ExecStartPost=/usr/bin/redis-cli flushall
 CPUShares=200
 
 [Install]
@@ -410,7 +408,7 @@ cat > /opt/studio/bin/studio-update.sh << EOF
 #!/bin/bash
 version=\$(/usr/bin/redis-cli get next_release)
 if [ \$version ]; then
-    curl -L https://raw.githubusercontent.com/studio-link/images/\$version/bootstrap.sh | bash
+    curl -L https://raw.githubusercontent.com/studio-link/images/\$version/bootstrap.sh | bash -ex
 fi
 EOF
 
@@ -419,7 +417,7 @@ chmod +x /opt/studio/bin/studio-update.sh
 cat > /etc/systemd/system/studio-jackd.service << EOF
 [Unit]
 Description=Studio Link JACK DAEMON
-After=baresip studio-webapp
+After=baresip.service studio-webapp.service
 
 [Service]
 LimitRTPRIO=infinity
@@ -445,36 +443,6 @@ chmod +x /opt/studio/bin/studio-jackd.sh
 cat > /etc/sysctl.d/99-sysctl.conf << EOF
 # realtime fix jackd
 kernel.sched_rt_runtime_us = -1
-EOF
-
-cat > /etc/systemd/system/studio-gaudio_in.service << EOF
-[Unit]
-Description=Studio Link g_audio_IN
-After=studio-jackd
-
-[Service]
-LimitRTPRIO=infinity
-LimitMEMLOCK=infinity
-User=studio
-ExecStart=/usr/bin/alsa_in -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat > /etc/systemd/system/studio-gaudio_out.service << EOF
-[Unit]
-Description=Studio Link g_audio_OUT
-After=studio-jackd
-
-[Service]
-LimitRTPRIO=infinity
-LimitMEMLOCK=infinity
-User=studio
-ExecStart=/usr/bin/alsa_out -d hw:UAC2Gadget -c 2 -r 48000 -q 0 > /dev/null
-
-[Install]
-WantedBy=multi-user.target
 EOF
 
 cat > /opt/studio/.asoundrc << EOF
@@ -548,7 +516,7 @@ chown studio:studio /opt/studio/routing.xml
 cat > /etc/systemd/system/aj-snapshot.service << EOF
 [Unit]
 Description=aj-snapshot
-After=syslog.target network.target studio-jackd
+After=syslog.target network.target studio-jackd.service
 
 [Service]
 Type=simple
@@ -616,6 +584,34 @@ EOF
 
 chmod +x /opt/studio/bin/studio-playback.sh
 
+if [ ! -f /etc/studio-link-community ]; then
+    cat > /opt/studio/bin/studio-vpn-update.sh << EOF
+#!/bin/bash
+
+hostname=\$(ip link show eth0 | grep ether | awk '{ print \$2 }' | sed s/://g | cut -c 7-)
+private_ip=\$(hostname -i)
+
+curl --data "hostname=\$hostname&private_ip=\$private_ip" https://vpn.studio-link.de/update.php
+EOF
+    chmod +x /opt/studio/bin/studio-vpn-update.sh
+
+    cat > /etc/systemd/system/studio-vpn-update.service << EOF
+[Unit]
+Description=studio-vpn-update
+After=syslog.target network.target ntpdate.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/opt/studio/bin/studio-vpn-update.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+fi
+
 systemctl daemon-reload
 
 # Enable systemd start scripts
@@ -631,6 +627,9 @@ systemctl enable fake-hwclock
 systemctl enable studio-jackd
 systemctl enable aj-snapshot
 systemctl enable lldpd
+if [ ! -f /etc/studio-link-community ]; then
+    systemctl enable studio-vpn-update
+fi
 
 # Temporary disabling ip6tables until final version
 systemctl disable ip6tables.service
@@ -655,7 +654,7 @@ if [ $? -eq 0 ]; then
         # Mount Options (noatime)
         cat > /etc/fstab << EOF
 UUID=$uuid / ext4 defaults,noatime,nodiratime 0 1
-/dev/disk/by-path/platform-48060000.mmc-part1 /media auto defaults,x-systemd.automount 0 0
+/dev/disk/by-path/platform-48060000.mmc-part1 /media auto defaults,uid=1000,x-systemd.automount 0 0
 EOF
     fi
 fi
@@ -689,21 +688,10 @@ yes | pacman -Scc
 logrotate -f /etc/logrotate.conf
 
 if [[ "$(uname -m)" =~ armv7.? ]]; then
-    cd /tmp
-    wget $pkg_url/opus/opus-1.1-101-armv7h.pkg.tar.xz
-    wget $pkg_url/libre/libre-0.4.10-1-armv7h.pkg.tar.xz
-    wget $pkg_url/librem/librem-0.4.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/baresip/baresip-14.11.0-4-armv7h.pkg.tar.xz
-    wget $pkg_url/aj-snapshot/aj-snapshot-0.9.6-1-armv7h.pkg.tar.xz
-    wget $pkg_url/jack_capture/jack_capture-14.12.0-1-armv7h.pkg.tar.xz
-
     pacman -Q | grep linux-am33x
     if [ $? -eq 0 ]; then
-	    yes | pacman -S linux-am33x
+	    yes | pacman --needed -S linux-am33x
     fi
-
-    $pacman -U *-armv7h.pkg.tar.xz
-    rm -f /tmp/*-armv7h.pkg.tar.xz
 fi
 
 # Add Audio files

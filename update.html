@@ -21,11 +21,13 @@
             <div class="page-header">
                 <h1>Studio Link Update</h1>
             </div>
+	    <div class="alert alert-warning" role="alert">Please do not turn off! The update can take up to 30 minutes!</div>
             <div class="progress progress-striped active">
                 <div class="progress-bar"  role="progressbar" aria-valuenow="STATUS" aria-valuemin="0" aria-valuemax="100" style="width: STATUS%">
                     STATUS% Complete
                 </div>
             </div>
+	    <pre id="updatelog" style="background: #000; color:#FFF; height:400px; overflow-x:hidden; overflow-y:visible;"></pre>
         </div>
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -34,9 +36,22 @@
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
         <script>
-            jQuery(document).ready(function () {
-                setTimeout(function () { location.reload(1); }, 15000);
-            });
+	jQuery(document).ready(function () {
+		setTimeout(function () {
+			$.ajax({
+				url: "/",
+				success: function( data ) {
+					location.reload(1);
+				}
+			});
+		}, 15000);
+		$.get( "/cgi-bin/logging.sh", function( data ) {
+			$( "#updatelog" ).text( data );
+			var elem = document.getElementById('updatelog');
+			elem.scrollTop = elem.scrollHeight;
+		});
+
+	});
         </script>
     </body>
 </html>
