@@ -36,15 +36,22 @@
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 
         <script>
-            jQuery(document).ready(function () {
-                setTimeout(function () { location.reload(1); }, 15000);
+	jQuery(document).ready(function () {
+		setTimeout(function () {
+			$.ajax({
+				url: "/",
+				success: function( data ) {
+					location.reload(1);
+				}
+			});
+		}, 15000);
 		$.get( "/cgi-bin/logging.sh", function( data ) {
 			$( "#updatelog" ).text( data );
 			var elem = document.getElementById('updatelog');
 			elem.scrollTop = elem.scrollHeight;
 		});
 
-            });
+	});
         </script>
     </body>
 </html>
