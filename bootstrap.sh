@@ -170,6 +170,8 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/webapp/long_polling/server
+Restart=always
+RestartSec=5
 CPUShares=100
 
 [Install]
