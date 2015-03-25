@@ -153,7 +153,9 @@ Type=simple
 User=studio
 Group=studio
 ExecStart=/opt/studio/bin/gunicorn -w 2 -b 127.0.0.1:5000 --chdir /opt/studio/webapp app:app
--ExecStartPost=/usr/bin/redis-cli flushall
+ExecStartPost=/usr/bin/redis-cli flushall
+Restart=always
+RestartSec=5
 CPUShares=200
 
 [Install]
