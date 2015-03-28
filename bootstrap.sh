@@ -737,7 +737,7 @@ echo "Syncing filesystem..."
 sync; sleep 5; sync
 
 kill $http_pid
-wait $http_pid
+wait $http_pid || true
 systemctl start nginx
 
 # Update Version
