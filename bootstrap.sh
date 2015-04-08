@@ -27,7 +27,7 @@ update_status() {
 #!/bin/bash
 echo "Content-type: text/html"
 echo ""
-sudo journalctl | grep studio-update
+sudo journalctl -n 6000 | grep studio-update
 EOF
     chmod +x $update_docroot/cgi-bin/logging.sh
     curl -L https://raw.githubusercontent.com/studio-link/images/master/update.html | sed "s/STATUS/$1/g" > $update_docroot/index.html_tmp
