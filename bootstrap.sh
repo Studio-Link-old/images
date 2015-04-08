@@ -736,8 +736,11 @@ update_status 95 # 95%
 echo "Syncing filesystem..."
 sync; sleep 5; sync
 
+killall journalctl || true
+sleep 3 
 kill $http_pid
 wait $http_pid || true
+killall -KILL journalctl || true
 sleep 5
 systemctl start nginx
 
