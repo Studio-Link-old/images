@@ -17,7 +17,7 @@ pacman="pacman --noconfirm --force --needed"
 home="/opt/studio"
 repo="https://github.com/studio-link/webapp.git"
 pkg_url="https://github.com/studio-link/PKGBUILDs/raw/master"
-version="15.3.0-beta"
+version="15.3.1-beta"
 update_docroot="/tmp/update"
 
 update_status() {
