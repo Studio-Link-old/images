@@ -738,6 +738,7 @@ sync; sleep 5; sync
 
 kill $http_pid
 wait $http_pid || true
+sleep 5
 systemctl start nginx
 
 # Update Version
