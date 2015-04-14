@@ -543,7 +543,8 @@ Group=studio
 LimitRTPRIO=infinity
 LimitMEMLOCK=infinity
 ExecStart=/opt/studio/bin/studio-capture.sh
-ExecStop=/usr/bin/killall jack_capture
+ExecStop=/usr/bin/killall -w jack_capture
+KillMode=none
 WorkingDirectory=/media
 
 [Install]
