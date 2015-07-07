@@ -26,3 +26,6 @@ If you have a clean archlinux image you can run the following commands:
 touch /etc/studio-link-community
 curl -L https://raw.githubusercontent.com/studio-link/images/master/bootstrap.sh | bash
 ```
+### Login
+
+The default username and password is 'studio'.
